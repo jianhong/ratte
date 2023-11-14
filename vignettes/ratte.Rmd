@@ -1,0 +1,216 @@
+---
+title: "ratte Guide"
+author: "Jianhong Ou"
+bibliography: bibliography.bib
+csl: nature.csl
+vignette: >
+  %\VignetteIndexEntry{ratte Vignette}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+runtime: shiny
+---
+
+```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
+suppressPackageStartupMessages({
+  library(ratte)
+  library(AnnotationHub)
+  library(BSgenome.Drerio.UCSC.danRer11)
+  library(TxDb.Drerio.UCSC.danRer11.refGene)
+  library(EnhancedVolcano)
+  library(pheatmap)
+})
+knitr::opts_chunk$set(warning=FALSE, message=TRUE, fig.width=6, fig.height=5)
+```
+
+# Introduction
+
+Transposable elements (TEs) play a role in fostering genetic diversity,
+instigating genome rearrangements, and exerting both positive and negative
+effects on the host organism. The regulation of these elements constitutes a
+dynamic and intricate process, involving host defense mechanisms to control
+their activity.
+The [REdiscoverTE](https://github.com/ucsffrancislab/REdiscoverTE), presented in
+2019 by Kong et al.[@kong2019transposable], showcased remarkable accuracy in TE
+quantification. It stands out as a significantly more comprehensive and accurate
+method for robust, whole-transcriptome quantification.
+
+Nevertheless, the existing _REdiscoverTE_ is constrained by the human genome
+assembly GRCh38. To broaden the scope of annotation to encompass more species,
+the _ratte_ package has been devised. This package leverages the resources
+available within the Bioconductor community to prepare the necessary sequence
+files and annotations.
+
+# Quick start
+
+Here is an example using _ratte_ with a subset of RNA-seq data.
+
+## Installation
+
+First, install _ratte_ and other packages required to run 
+the examples.
+Please note that the example dataset used here is from zebrafish.
+To run analysis with dataset from a different species or different assembly,
+please install the corresponding Bsgenome and TxDb.
+For example, to analyze mouse data aligned to mm10, please install `BSgenome.Mmusculus.UCSC.mm10`, and `TxDb.Mmusculus.UCSC.mm10.knownGene`.
+You can also generate a TxDb object by functions `makeTxDbFromGFF` from
+a local gff file, or `makeTxDbFromUCSC`, `makeTxDbFromBiomart`, and
+`makeTxDbFromEnsembl`, from online resources in _GenomicFeatures_ package.
+The BSgenome package can be created by _BSgenomeForge_ package.
+
+Please note that the example dataset used here is from a small subset of
+zebrafish fin regeneration[@thompson2020identification].
+
+```{r, eval=FALSE}
+library(devtools)
+devtools::install("jianhong/ratte")
+
+## other annotation and helper libraries
+library(BiocManager)
+BiocManager::install(c("AnnotationHub",
+                       "BSgenome.Drerio.UCSC.danRer11",
+                       "TxDb.Drerio.UCSC.danRer11.refGene",
+                       "EnhancedVolcano",
+                       "pheatmap"))
+```
+
+## Load library
+
+```{r}
+library(ratte)
+```
+
+## Generating reference transcriptome
+
+The reference transcriptome includes:
+
+1. Distinct RNA transcript sequences prepared by `GenomicFeatures::extractTranscriptSeqs` function for output of `GenomicFeatures::exonsBy` at transcript level.
+
+2. Distinct sequences representing RE-containing introns by `GenomicFeatures::intronicParts`.
+
+3. Distinct RepeatMasker elements in the intergenic region.
+
+In this manual, we will use the fish genome.
+```{r}
+library(AnnotationHub)
+library(BSgenome.Drerio.UCSC.danRer11)
+## set genome, Drerio is a shortname for BSgenome.Drerio.UCSC.danRer11
+genome <- Drerio
+library(TxDb.Drerio.UCSC.danRer11.refGene)
+txdb <- TxDb.Drerio.UCSC.danRer11.refGene ## give it a short name
+```
+
+```{r}
+ah <- AnnotationHub()
+(rmsk <- query(ah, c('RepeatMasker', 'Zebrafish')))
+```
+```{r, eval=FALSE}
+rmsk <- rmsk[['AH98980']]
+```
+
+We will use a subset of fish genome in this manual.
+Please skip this step if you want try the full fish genome.
+```{r}
+rmsk <- readRDS(system.file('extdata', 'danRer11_rmsk_chr25_sub.RDS',
+                            package='ratte'))
+```
+
+The `prepareSeq` function will extract the sequences and merge the 
+RepeatMasker elements annotation.
+The `saveFasta` function is uesed to export the sequences into a fasta file.
+
+```{r}
+seq_anno <- prepareSeq(genome, txdb, rmsk,
+## The subsetGRanges parameter is only used for subset the genome.
+## Please remove this parameter for full fish genome.
+                       subsetGRanges=GRanges('chr25:11000000-15000000'))
+outfile <- tempfile(fileext='.fa.gz')
+saveFasta(seq_anno, outfile)
+```
+
+## Align reads by salmon
+
+First we will create salmon index. In this example, we will just export the 
+command by setting `dryrun` parameter to TRUE.
+```{r}
+prepareSalmonIndex(salmonPath='salmon',
+                   FaFile=outfile,
+                   index='TEindex',
+                   dryrun=TRUE)
+```
+
+Second, we will align reads to salmon index.
+```{r}
+alignReadsBySalmon('sample1.R1.fq.gz', 'sample1.R2.fq.gz',
+                    output='sample1_salmon_output',
+                    index='TEindex',
+                    dryrun=TRUE)
+```
+
+Once alignment is done, we will get quantification file named as `quant.sf`.
+In this manual, we will load pre-aligned files.
+```{r}
+quant_sfs <- dir(system.file('extdata', package='ratte'), 'quant.sf',
+                 full.names=TRUE)
+qnames <- sub("^.*\\/(.*?).quant.sf", "\\1", quant_sfs)
+```
+
+## Aggregate alignments to repeat element (RE).
+
+The `createDGELists` function will extract counts number from the `quant.sf`
+files and generate a list of `edgeR::DGEList` object. The available choices for
+`select_feature` are 'all', 'exon', 'intron', 'gene', and 'intergenic'.
+Here we use `all` as an example.
+Please note that the DGEList library size and normliazation factor will be
+determined by gene level counts.
+
+```{r}
+ys <- createDGELists(quant_sfs, qnames, seq_anno,
+                     select_feature = 'all',
+                     group=sub('.rep.', '', qnames),
+                     remove.zeros = TRUE)
+names(ys)
+ys[[1]]
+```
+
+## Analyze results with _edgeR_
+
+
+```{r}
+library(edgeR)
+library(EnhancedVolcano)
+library(pheatmap)
+y <- ys[['repName']]
+keep <- filterByExpr(y)
+y <- y[keep, keep.lib.sizes=TRUE]
+design <- model.matrix(~y$samples$group)
+y <- estimateDisp(y, design)
+fit <- glmFit(y, design)
+lrt <- glmLRT(fit, coef=2)
+res <- as.data.frame(topTags(lrt, n=nrow(lrt)))
+EnhancedVolcano(res,
+                lab=rownames(res),
+                x='logFC',
+                y='PValue',
+                title='Volcano plot for repeat elements',
+                subtitle = NULL,
+                legendPosition = 'right'
+                )
+
+de <- res[abs(res$logFC)>2 & res$FDR<0.05, ]
+plotdata <- y$tpm[rownames(de), ]
+pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
+```
+
+# SessionInfo
+
+```{r}
+sessionInfo()
+```
+
+
+# References

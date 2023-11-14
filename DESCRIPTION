@@ -1,0 +1,47 @@
+Package: ratte
+Type: Package
+Title: The use of RnA-seq for AnnoTation of Transposable Elements
+Version: 0.0.1
+Encoding: UTF-8
+Authors@R:
+    c(person(given = "Jianhong",
+             family = "Ou",
+             role = c("aut", "cre"),
+             email = "jianhong.ou@duke.edu",
+             comment=c(ORCID="0000-0002-8652-2488")))
+Depends:
+    R (>= 4.3)
+Imports:
+    BiocGenerics,
+    Biostrings,
+    BSgenome,
+    data.table,
+    digest,
+    dplyr,
+    edgeR,
+    GenomeInfoDb,
+    GenomicFeatures,
+    IRanges,
+    methods,
+    parallel,
+    readr,
+    S4Vectors,
+    tibble
+Suggests:
+    AnnotationHub,
+    BiocStyle,
+    BSgenome.Drerio.UCSC.danRer11,
+    EnhancedVolcano,
+    knitr,
+    rmarkdown,
+    testthat,
+    TxDb.Drerio.UCSC.danRer11.refGene,
+    pheatmap
+Description: The package .
+License: MIT + file LICENSE
+biocViews: Annotation, RNAseq, GeneRegulation, Sequencing, Software
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+URL: https://github.com/jianhong/ratte
+BugReports: https://github.com/jianhong/ratte/issues
