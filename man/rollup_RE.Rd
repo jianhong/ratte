@@ -4,7 +4,7 @@
 \alias{rollup_RE}
 \title{Rollup multiple salmon quants}
 \usage{
-rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus = 2)
+rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus = 2, retry = 3)
 }
 \arguments{
 \item{quant_sfs}{The salmon quant.sf files path.}
@@ -17,6 +17,8 @@ rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus = 2)
 'all', 'exon', 'intron', 'gene', or 'intergenic'.}
 
 \item{cpus}{Number of threads.}
+
+\item{retry}{Retry number for the rollup.}
 }
 \description{
 Rollup the TPM and NumReads for repeat elements from salmon quants.

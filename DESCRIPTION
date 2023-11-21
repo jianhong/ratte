@@ -1,7 +1,7 @@
 Package: ratte
 Type: Package
 Title: The use of RnA-seq for AnnoTation of Transposable Elements
-Version: 0.0.1
+Version: 0.0.2
 Encoding: UTF-8
 Authors@R:
     c(person(given = "Jianhong",

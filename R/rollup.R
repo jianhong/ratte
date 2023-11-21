@@ -34,6 +34,7 @@ rollup_one_RE <- function(quant_sf, seq_anno){
 #' @param select_feature Type of feature. Available choices are:
 #' 'all', 'exon', 'intron', 'gene', or 'intergenic'.
 #' @param cpus Number of threads.
+#' @param retry Retry number for the rollup.
 #' @importFrom parallel mclapply
 #' @export
 #' @examples
@@ -53,9 +54,12 @@ rollup_one_RE <- function(quant_sf, seq_anno){
 #' re_gene_level <- rollup_RE(quant_sfs, qnames, seq_anno, 'gene')
 rollup_RE <- function(quant_sfs, qnames, seq_anno,
                       select_feature,
-                      cpus=2){
+                      cpus=2,
+                      retry=3){
   stopifnot("quant_sfs is empty."=length(quant_sfs)>=1)
   stopifnot(length(quant_sfs)==length(qnames))
+  stopifnot(is.numeric(retry))
+  stopifnot(retry>0)
   names(quant_sfs) <- qnames
   select_feature <- 
     match.arg(select_feature,
@@ -67,9 +71,18 @@ rollup_RE <- function(quant_sfs, qnames, seq_anno,
     'intergenic' = seq_anno[seq_anno$feature=='intergenic', , drop=FALSE],
     'gene' = seq_anno[seq_anno$feature %in% c('exon', 'intron'), , drop=FALSE]
   )
-  se <- mclapply(quant_sfs, FUN = function(quant_sf){
-    rollup_one_RE(quant_sf = quant_sf, seq_anno = seq_anno)
-  }, mc.cores=cpus)
+  see <- TRUE
+  while(retry>0 && any(see)){
+    retry <- retry - 1
+    se <- mclapply(quant_sfs, FUN = function(quant_sf){
+      rollup_one_RE(quant_sf = quant_sf, seq_anno = seq_anno)
+    }, mc.cores=cpus)
+    see <- mapply(inherits, se, 'try-error')
+  }
+  if(any(see)){
+    message(se[see])
+    stop('Error in read the quant files. You may want to retry it again.')
+  }
   rn <- rownames(se[[1]][[1]])
   rn_identical <- vapply(se, FUN = function(.ele){
     all(rownames(.ele[[1]])==rn)
