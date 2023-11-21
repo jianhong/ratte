@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ratte</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
       </span>
     </div>
 
@@ -53,7 +53,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rollup_RE</span><span class="op">(</span><span class="va">quant_sfs</span>, <span class="va">qnames</span>, <span class="va">seq_anno</span>, <span class="va">select_feature</span>, cpus <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rollup_RE</span><span class="op">(</span><span class="va">quant_sfs</span>, <span class="va">qnames</span>, <span class="va">seq_anno</span>, <span class="va">select_feature</span>, cpus <span class="op">=</span> <span class="fl">2</span>, retry <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -77,6 +77,10 @@
 
 <dt>cpus</dt>
 <dd><p>Number of threads.</p></dd>
+
+
+<dt>retry</dt>
+<dd><p>Retry number for the rollup.</p></dd>
 
 </dl></div>
 
