@@ -19,7 +19,7 @@ generate the annotation for repeat elements."><!-- mathjax --><script src="https
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ratte</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.3</span>
       </span>
     </div>
 
@@ -57,7 +57,7 @@ generate the annotation for repeat elements.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepareSeq</span><span class="op">(</span><span class="va">genome</span>, <span class="va">txdb</span>, <span class="va">rmsk</span>, minWidth <span class="op">=</span> <span class="fl">31L</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepareSeq</span><span class="op">(</span><span class="va">genome</span>, <span class="va">txdb</span>, <span class="va">rmsk</span>, <span class="va">peaks</span>, minWidth <span class="op">=</span> <span class="fl">31L</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -72,6 +72,10 @@ generate the annotation for repeat elements.</p>
 
 <dt>rmsk</dt>
 <dd><p>The RepeatMasker GRanges object</p></dd>
+
+
+<dt>peaks</dt>
+<dd><p>An GRanges object to represent the peak list.</p></dd>
 
 
 <dt>minWidth</dt>
