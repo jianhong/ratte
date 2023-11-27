@@ -1,7 +1,9 @@
 Package: ratte
 Type: Package
-Title: The use of RnA-seq for AnnoTation of Transposable Elements
-Version: 0.0.2
+Title:
+    Integrating RNA-seq and ATAC-seq for
+    the Annotation of Transposable Elements
+Version: 0.0.3
 Encoding: UTF-8
 Authors@R:
     c(person(given = "Jianhong",
@@ -34,6 +36,7 @@ Suggests:
     EnhancedVolcano,
     knitr,
     rmarkdown,
+    rtracklayer,
     testthat,
     TxDb.Drerio.UCSC.danRer11.refGene,
     pheatmap

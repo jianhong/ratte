@@ -18,6 +18,8 @@ runtime: shiny
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
 suppressPackageStartupMessages({
   library(ratte)
+  library(rtracklayer)
+  library(edgeR)
   library(AnnotationHub)
   library(BSgenome.Drerio.UCSC.danRer11)
   library(TxDb.Drerio.UCSC.danRer11.refGene)
@@ -45,7 +47,7 @@ the _ratte_ package has been devised. This package leverages the resources
 available within the Bioconductor community to prepare the necessary sequence
 files and annotations.
 
-# Quick start
+# Quick start for RNA-seq data
 
 Here is an example using _ratte_ with a subset of RNA-seq data.
 
@@ -71,7 +73,7 @@ devtools::install("jianhong/ratte")
 
 ## other annotation and helper libraries
 library(BiocManager)
-BiocManager::install(c("AnnotationHub",
+BiocManager::install(c("AnnotationHub", "rtracklayer",
                        "BSgenome.Drerio.UCSC.danRer11",
                        "TxDb.Drerio.UCSC.danRer11.refGene",
                        "EnhancedVolcano",
@@ -128,8 +130,8 @@ seq_anno <- prepareSeq(genome, txdb, rmsk,
 ## The subsetGRanges parameter is only used for subset the genome.
 ## Please remove this parameter for full fish genome.
                        subsetGRanges=GRanges('chr25:11000000-15000000'))
-outfile <- tempfile(fileext='.fa.gz')
-saveFasta(seq_anno, outfile)
+rna_outfile <- tempfile(fileext='.fa.gz')
+saveFasta(seq_anno, rna_outfile)
 ```
 
 ## Align reads by salmon
@@ -138,8 +140,8 @@ First we will create salmon index. In this example, we will just export the
 command by setting `dryrun` parameter to TRUE.
 ```{r}
 prepareSalmonIndex(salmonPath='salmon',
-                   FaFile=outfile,
-                   index='TEindex',
+                   FaFile=rna_outfile,
+                   index='RNA_TEindex',
                    dryrun=TRUE)
 ```
 
@@ -147,14 +149,14 @@ Second, we will align reads to salmon index.
 ```{r}
 alignReadsBySalmon('sample1.R1.fq.gz', 'sample1.R2.fq.gz',
                     output='sample1_salmon_output',
-                    index='TEindex',
+                    index='RNA_TEindex',
                     dryrun=TRUE)
 ```
 
 Once alignment is done, we will get quantification file named as `quant.sf`.
 In this manual, we will load pre-aligned files.
 ```{r}
-quant_sfs <- dir(system.file('extdata', package='ratte'), 'quant.sf',
+quant_sfs <- dir(system.file('extdata', 'RNA-seq', package='ratte'), 'quant.sf',
                  full.names=TRUE)
 qnames <- sub("^.*\\/(.*?).quant.sf", "\\1", quant_sfs)
 ```
@@ -204,6 +206,112 @@ EnhancedVolcano(res,
 de <- res[abs(res$logFC)>2 & res$FDR<0.05, ]
 plotdata <- y$tpm[rownames(de), ]
 pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
+```
+
+# Quick start for ATAC-seq data
+
+## Generating reference for ATAC-seq
+
+The reference includes:
+
+1. Distinct exon sequences prepared by `BSgenome::getSeq` function for output of `GenomicFeatures::exons`.
+
+2. Distinct sequences representing RE-containing introns by `GenomicFeatures::intronicParts`.
+
+3. Distinct RepeatMasker elements in the intergenic region.
+
+For ATAC-seq, to prepare the sequences, the called peaks are required.
+```{r}
+library(rtracklayer)
+peaks <- import(system.file('extdata', 'merged.peaks.bed.gz',
+                            package = 'ratte'),
+                format = 'bed')
+atac_seq_anno <- prepareSeq(genome, txdb, rmsk, peaks)
+atac_outfile <- tempfile(fileext='.fa.gz')
+saveFasta(atac_seq_anno, atac_outfile)
+```
+
+## Align reads by salmon
+
+First we will create salmon index. In this example, we will just export the 
+command by setting `dryrun` parameter to TRUE.
+```{r}
+prepareSalmonIndex(salmonPath='salmon',
+                   FaFile=atac_outfile,
+                   index='ATAC_TEindex',
+                   dryrun=TRUE)
+```
+
+Second, we will align reads to salmon index.
+```{r}
+alignReadsBySalmon('sample1.R1.fq.gz', 'sample1.R2.fq.gz',
+                    output='sample1_salmon_output',
+                    index='ATAC_TEindex',
+                    dryrun=TRUE)
+```
+
+Once alignment is done, we will get quantification file named as `quant.sf`.
+In this manual, we will load pre-aligned files.
+```{r}
+atac_quant_sfs <- dir(system.file('extdata', 'ATAC-seq',
+                                  package='ratte'),
+                      'quant.sf',
+                      full.names=TRUE)
+atac_qnames <- sub("^.*\\/(.*?).quant.sf", "\\1", atac_quant_sfs)
+```
+
+## Aggregate alignments to repeat element (RE).
+
+The `createDGELists` function will extract counts number from the `quant.sf`
+files and generate a list of `edgeR::DGEList` object. The available choices for
+`select_feature` are 'all', 'exon', 'intron', 'gene', and 'intergenic'.
+Here we use `all` as an example.
+Please note that different from RNA-seq data, the DGEList library size and
+normliazation factor will be determined by `all` feature counts.
+
+```{r}
+atac_ys <- createDGELists(atac_quant_sfs, atac_qnames, atac_seq_anno,
+                          select_feature = 'all',
+                          group=sub('.rep.', '', atac_qnames),
+                          norm_level='all',
+                          remove.zeros = TRUE)
+names(atac_ys)
+atac_ys[[1]]
+```
+
+## Analyze results with _edgeR_
+
+```{r, fig.height=3}
+y <- atac_ys[['repName']]
+keep <- filterByExpr(y)
+y <- y[keep, keep.lib.sizes=TRUE]
+design <- model.matrix(~y$samples$group)
+y <- estimateDisp(y, design)
+fit <- glmFit(y, design)
+lrt <- glmLRT(fit, coef=2)
+atac_res <- as.data.frame(topTags(lrt, n=nrow(lrt)))
+EnhancedVolcano(atac_res,
+                lab=rownames(atac_res),
+                x='logFC',
+                y='PValue',
+                title='Volcano plot for repeat elements',
+                subtitle = NULL,
+                legendPosition = 'right'
+                )
+atac_de <- atac_res[abs(atac_res$logFC)>log2(1.5) & atac_res$PValue<0.05, ]
+plotdata <- y$tpm[rownames(atac_de), ]
+pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
+```
+
+# Merge the results from RNA-seq and ATAC-seq
+
+```{r}
+m <- merge(res, atac_res, suffixes = c(".RNA",".ATAC"),
+           by='row.names')
+m <- m[order(-1*sign(m$logFC.RNA)*sign(m$logFC.ATAC), 
+               sqrt(m$PValue.RNA^2 + m$PValue.ATAC^2)), ]
+head(m, n=2)
+head(seq_anno[seq_anno$repName==m[1, 1], ])
 ```
 
 # SessionInfo

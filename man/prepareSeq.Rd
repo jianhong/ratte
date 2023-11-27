@@ -4,7 +4,7 @@
 \alias{prepareSeq}
 \title{Prepare the sequences with repeat elements}
 \usage{
-prepareSeq(genome, txdb, rmsk, minWidth = 31L, verbose = FALSE, ...)
+prepareSeq(genome, txdb, rmsk, peaks, minWidth = 31L, verbose = FALSE, ...)
 }
 \arguments{
 \item{genome}{A BSgenome object}
@@ -12,6 +12,8 @@ prepareSeq(genome, txdb, rmsk, minWidth = 31L, verbose = FALSE, ...)
 \item{txdb}{A TxDb object}
 
 \item{rmsk}{The RepeatMasker GRanges object}
+
+\item{peaks}{An GRanges object to represent the peak list.}
 
 \item{minWidth}{Minimal width for the repeat elements in the intergenic
 annotation.}

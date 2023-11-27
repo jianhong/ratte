@@ -16,10 +16,13 @@ checkRMSK <- function(rmsk){
 }
 
 #' @importFrom methods is
-checkInputs <- function(genome, txdb, rmsk){
+checkInputs <- function(genome, txdb, rmsk, peaks){
   checkRMSK(rmsk)
   stopifnot(is(genome, 'BSgenome'))
   stopifnot(is(txdb, 'TxDb'))
+  if(!missing(peaks)){
+    stopifnot(is(peaks, 'GRanges'))
+  }
 }
 
 #' @importFrom data.table .N .SD as.data.table
@@ -76,13 +79,24 @@ prepareSeqWithAnno <- function(rmsk, genome, gr,
 
 #' @importFrom GenomicFeatures exonsBy extractTranscriptSeqs
 #' @importFrom IRanges subsetByOverlaps
-getExonsSeq <- function(genome, txdb, rmsk, subsetGRanges, ...){
-  checkInputs(genome, txdb, rmsk)
-  exons <- exonsBy(x = txdb, by = 'tx', use.names=TRUE)
+getExonsSeq <- function(genome, txdb, rmsk, peaks, subsetGRanges, ...){
+  checkInputs(genome, txdb, rmsk, peaks)
+  if(!missing(peaks)){
+    exons <- exons(x = txdb)
+    exons <- subsetByOverlaps(x = exons, ranges = peaks, minoverlap = 1L,
+                              ignore.strand = TRUE)
+  }else{
+    exons <- exonsBy(x = txdb, by = 'tx', use.names=TRUE)
+  }
   if(!missing(subsetGRanges)){
     exons <- subsetByOverlaps(exons, subsetGRanges)
   }
-  exonSeq <- extractTranscriptSeqs(x=genome, transcripts=exons)
+  if(!missing(peaks)){
+    exonSeq <- getSeq(x=genome, names=exons)
+    exons <- as(exons, 'GRangesList')
+  }else{
+    exonSeq <- extractTranscriptSeqs(x=genome, transcripts=exons)
+  }
   names(exonSeq) <- md5sum(exonSeq)
   anno <- prepareAnno(exons, rmsk, exonSeq, seq_type = 'exon')
   anno
@@ -90,12 +104,16 @@ getExonsSeq <- function(genome, txdb, rmsk, subsetGRanges, ...){
 
 #' @importFrom GenomicFeatures intronicParts
 #' @importFrom BSgenome getSeq
-getIntronsSeq <- function(genome, txdb, rmsk, seqnamesToBeRemoved, ...){
-  checkInputs(genome, txdb, rmsk)
+getIntronsSeq <- function(genome, txdb, rmsk, peaks, seqnamesToBeRemoved, ...){
+  checkInputs(genome, txdb, rmsk, peaks)
   if(missing(seqnamesToBeRemoved)){
     stop('seqnamesToBeRemoved is required')
   }
   introns <- intronicParts(txdb = txdb) # this set the priority of exon first
+  if(!missing(peaks)){
+    introns <- subsetByOverlaps(x = introns, ranges = peaks, minoverlap = 1L,
+                                ignore.strand = TRUE)
+  }
   prepareSeqWithAnno(rmsk, genome, introns, seq_type = 'intron',
                      seqnamesToBeRemoved, ...)
 }
@@ -104,17 +122,22 @@ getIntronsSeq <- function(genome, txdb, rmsk, seqnamesToBeRemoved, ...){
 #' @importMethodsFrom IRanges subsetByOverlaps reduce
 #' @importFrom BiocGenerics start end width `start<-` `end<-`
 #' @importFrom GenomeInfoDb seqnames seqlengths
-getIntergenicSeq <- function(genome, txdb, rmsk,
+getIntergenicSeq <- function(genome, txdb, rmsk, peaks,
                              seqnamesToBeRemoved,
                              minWidth=31,
                              ...){
-  checkInputs(genome, txdb, rmsk)
+  checkInputs(genome, txdb, rmsk, peaks)
   if(missing(seqnamesToBeRemoved)){
     stop('seqnamesToBeRemoved is required')
   }
   genes <- genes(x = txdb, single.strand.genes.only = FALSE)
   intergenic <- subsetByOverlaps(x = rmsk, ranges = genes, invert = TRUE)
   intergenic <- reduce(x = intergenic, ignore.strand = TRUE)
+  if(!missing(peaks)){
+    intergenic <- subsetByOverlaps(x = intergenic, ranges = peaks,
+                                   minoverlap = 1L,
+                                   ignore.strand = TRUE)
+  }
   intergenic_width <- width(intergenic)
   k <- intergenic_width < minWidth
   center_ <- start(intergenic[k]) + k[k]/2

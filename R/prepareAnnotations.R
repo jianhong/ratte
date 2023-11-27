@@ -6,6 +6,7 @@
 #' @param genome A BSgenome object
 #' @param txdb A TxDb object
 #' @param rmsk The RepeatMasker GRanges object
+#' @param peaks An GRanges object to represent the peak list.
 #' @param minWidth Minimal width for the repeat elements in the intergenic
 #'  annotation.
 #' @param verbose Print the message or not.
@@ -25,16 +26,17 @@
 #' prepareSeq(Drerio,
 #'            TxDb.Drerio.UCSC.danRer11.refGene,
 #'            rmsk)
-prepareSeq <- function(genome, txdb, rmsk, minWidth=31L, verbose = FALSE, ...){
+prepareSeq <- function(genome, txdb, rmsk, peaks,
+                       minWidth=31L, verbose = FALSE, ...){
   checkInputs(genome, txdb, rmsk)
   stopifnot(is.numeric(minWidth))
   stopifnot(is.logical(verbose))
   if(verbose) message('Prepare the exons...')
-  exonSeq <- getExonsSeq(genome, txdb, rmsk, ...)
+  exonSeq <- getExonsSeq(genome, txdb, rmsk, peaks, ...)
   if(verbose) message('Prepare the introns...')
-  intronSeq <- getIntronsSeq(genome, txdb, rmsk, exonSeq$seqname, ...)
+  intronSeq <- getIntronsSeq(genome, txdb, rmsk, peaks, exonSeq$seqname, ...)
   if(verbose) message('Prepare the intergenics...')
-  intergenicSeq <- getIntergenicSeq(genome, txdb, rmsk,
+  intergenicSeq <- getIntergenicSeq(genome, txdb, rmsk, peaks,
                                     c(exonSeq$seqname, intronSeq$seqname),
                                     minWidth = minWidth,
                                     ...)

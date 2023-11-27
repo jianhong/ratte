@@ -1,6 +1,7 @@
 # ratte
-The use of RnA-seq for AnnoTation of Transposable Elements (ratte) is a package
-to enhance the power of [REdiscoverTE](https://github.com/ucsffrancislab/REdiscoverTE)
+Integrating Rna-seq and ATac-seq for the annotation of Transposable Elements
+(ratte) is a package to enhance the power of
+[REdiscoverTE](https://github.com/ucsffrancislab/REdiscoverTE)
 by break down the barrier of species. 
 To broaden the scope of annotation to encompass more species, the ratte package 
 leverages the resources available within the Bioconductor community to prepare

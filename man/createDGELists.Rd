@@ -11,6 +11,7 @@ createDGELists(
   select_feature,
   cpus = 2,
   norm_method = "RLE",
+  norm_level = "gene",
   ...
 )
 }
@@ -28,6 +29,8 @@ createDGELists(
 
 \item{norm_method}{Normalization method for edgeR.}
 
+\item{norm_level}{Normalization feature level for edgeR.}
+
 \item{...}{Parameters will be passed to \link[edgeR:DGEList]{DGEList}.
 Please note, the default norm.factors and lib.size will be calculated
 at gene level.}
@@ -39,7 +42,8 @@ A list of DGEList objects.
 Create a list of edgeR DGEList object for repeat elements from salmon quants.
 }
 \examples{
-quant_sfs <- dir(system.file('extdata', package='ratte'), 'quant.sf',
+quant_sfs <- dir(system.file('extdata', 'RNA-seq', package='ratte'),
+        'quant.sf',
  full.names=TRUE)
 qnames <- sub("^.*\\\\/(.*?).quant.sf", "\\\\1", quant_sfs)
 rmsk <- readRDS(system.file('extdata', 'danRer11_rmsk_chr25_sub.RDS',

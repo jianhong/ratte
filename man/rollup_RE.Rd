@@ -24,7 +24,8 @@ rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus = 2, retry = 3)
 Rollup the TPM and NumReads for repeat elements from salmon quants.
 }
 \examples{
-quant_sfs <- dir(system.file('extdata', package='ratte'), 'quant.sf',
+quant_sfs <- dir(system.file('extdata', 'RNA-seq', package='ratte'),
+        'quant.sf',
  full.names=TRUE)
 qnames <- sub("^.*\\\\/(.*?).quant.sf", "\\\\1", quant_sfs)
 rmsk <- readRDS(system.file('extdata', 'danRer11_rmsk_chr25_sub.RDS',

@@ -38,7 +38,8 @@ rollup_one_RE <- function(quant_sf, seq_anno){
 #' @importFrom parallel mclapply
 #' @export
 #' @examples
-#' quant_sfs <- dir(system.file('extdata', package='ratte'), 'quant.sf',
+#' quant_sfs <- dir(system.file('extdata', 'RNA-seq', package='ratte'),
+#'         'quant.sf',
 #'  full.names=TRUE)
 #' qnames <- sub("^.*\\/(.*?).quant.sf", "\\1", quant_sfs)
 #' rmsk <- readRDS(system.file('extdata', 'danRer11_rmsk_chr25_sub.RDS',
@@ -112,6 +113,7 @@ rollup_RE <- function(quant_sfs, qnames, seq_anno,
 #' 'all', 'exon', 'intron', 'gene', or 'intergenic'.
 #' @param cpus Number of threads.
 #' @param norm_method Normalization method for edgeR.
+#' @param norm_level Normalization feature level for edgeR.
 #' @param ... Parameters will be passed to \link[edgeR:DGEList]{DGEList}.
 #' Please note, the default norm.factors and lib.size will be calculated
 #' at gene level.
@@ -119,7 +121,8 @@ rollup_RE <- function(quant_sfs, qnames, seq_anno,
 #' @importFrom edgeR DGEList calcNormFactors
 #' @export
 #' @examples
-#' quant_sfs <- dir(system.file('extdata', package='ratte'), 'quant.sf',
+#' quant_sfs <- dir(system.file('extdata', 'RNA-seq', package='ratte'),
+#'         'quant.sf',
 #'  full.names=TRUE)
 #' qnames <- sub("^.*\\/(.*?).quant.sf", "\\1", quant_sfs)
 #' rmsk <- readRDS(system.file('extdata', 'danRer11_rmsk_chr25_sub.RDS',
@@ -151,10 +154,14 @@ rollup_RE <- function(quant_sfs, qnames, seq_anno,
 createDGELists <- function(quant_sfs, qnames, seq_anno,
                            select_feature, cpus=2,
                            norm_method = "RLE",
+                           norm_level = "gene",
                            ...){
+  norm_level <- 
+    match.arg(norm_level,
+              choices = c('all', 'exon', 'intron', 'gene', 'intergenic'))
   re <- rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus)
-  if(select_feature!='gene'){
-    re_gene <- rollup_RE(quant_sfs, qnames, seq_anno, 'gene', cpus)
+  if(select_feature!=norm_level){
+    re_gene <- rollup_RE(quant_sfs, qnames, seq_anno, norm_level, cpus)
   }else{
     re_gene <- re
   }
