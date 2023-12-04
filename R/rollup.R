@@ -64,13 +64,14 @@ rollup_RE <- function(quant_sfs, qnames, seq_anno,
   names(quant_sfs) <- qnames
   select_feature <- 
     match.arg(select_feature,
-              choices = c('all', 'exon', 'intron', 'gene', 'intergenic'))
+              choices = .globals$feature_types_choices)
   seq_anno <- switch (select_feature,
     'all' = seq_anno,
     'exon' = seq_anno[seq_anno$feature=='exon', , drop=FALSE],
     'intron' = seq_anno[seq_anno$feature=='intron', , drop=FALSE],
     'intergenic' = seq_anno[seq_anno$feature=='intergenic', , drop=FALSE],
-    'gene' = seq_anno[seq_anno$feature %in% c('exon', 'intron'), , drop=FALSE]
+    'gene' = seq_anno[seq_anno$feature %in% c('exon', 'intron'), , drop=FALSE],
+    'peak' = seq_anno[seq_anno$feature=='peak', , drop=FALSE]
   )
   see <- TRUE
   while(retry>0 && any(see)){
@@ -158,8 +159,12 @@ createDGELists <- function(quant_sfs, qnames, seq_anno,
                            ...){
   norm_level <- 
     match.arg(norm_level,
-              choices = c('all', 'exon', 'intron', 'gene', 'intergenic'))
+              choices = .globals$feature_types_choices)
   re <- rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus)
+  if(!norm_level %in% seq_anno$feature){
+    warning(norm_level, ' is not available in the annotation. Use "all".')
+    norm_level <- 'all'
+  }
   if(select_feature!=norm_level){
     re_gene <- rollup_RE(quant_sfs, qnames, seq_anno, norm_level, cpus)
   }else{

@@ -28,19 +28,24 @@
 #'            rmsk)
 prepareSeq <- function(genome, txdb, rmsk, peaks,
                        minWidth=31L, verbose = FALSE, ...){
-  checkInputs(genome, txdb, rmsk)
+  checkInputs(genome, txdb, rmsk, peaks)
   stopifnot(is.numeric(minWidth))
   stopifnot(is.logical(verbose))
-  if(verbose) message('Prepare the exons...')
-  exonSeq <- getExonsSeq(genome, txdb, rmsk, peaks, ...)
-  if(verbose) message('Prepare the introns...')
-  intronSeq <- getIntronsSeq(genome, txdb, rmsk, peaks, exonSeq$seqname, ...)
-  if(verbose) message('Prepare the intergenics...')
-  intergenicSeq <- getIntergenicSeq(genome, txdb, rmsk, peaks,
-                                    c(exonSeq$seqname, intronSeq$seqname),
-                                    minWidth = minWidth,
-                                    ...)
-  seq <- rbind(exonSeq, intronSeq, intergenicSeq)
+  if(!missing(peaks)){
+    if(verbose) message('Prepare the peaks ...')
+    seq <- getPeakSeq(genome, txdb, rmsk, peaks, minWidth = minWidth, ...)
+  }else{
+    if(verbose) message('Prepare the exons...')
+    exonSeq <- getExonsSeq(genome, txdb, rmsk, ...)
+    if(verbose) message('Prepare the introns...')
+    intronSeq <- getIntronsSeq(genome, txdb, rmsk, exonSeq$seqname, ...)
+    if(verbose) message('Prepare the intergenics...')
+    intergenicSeq <- getIntergenicSeq(genome, txdb, rmsk,
+                                      c(exonSeq$seqname, intronSeq$seqname),
+                                      minWidth = minWidth,
+                                      ...)
+    seq <- rbind(exonSeq, intronSeq, intergenicSeq)
+  }
   seq
 }
 

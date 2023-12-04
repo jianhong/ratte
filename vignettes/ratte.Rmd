@@ -208,19 +208,13 @@ plotdata <- y$tpm[rownames(de), ]
 pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
 ```
 
-# Quick start for ATAC-seq data
+# Quick start for ATAC-seq/ChIP-seq data
 
-## Generating reference for ATAC-seq
+## Generating reference for ATAC-seq/ChIP-seq
 
-The reference includes:
+The reference are distinct sequences representing RE-containing peaks.
 
-1. Distinct exon sequences prepared by `BSgenome::getSeq` function for output of `GenomicFeatures::exons`.
-
-2. Distinct sequences representing RE-containing introns by `GenomicFeatures::intronicParts`.
-
-3. Distinct RepeatMasker elements in the intergenic region.
-
-For ATAC-seq, to prepare the sequences, the called peaks are required.
+For ATAC-seq/ChIP-seq, to prepare the sequences, the called peaks are required.
 ```{r}
 library(rtracklayer)
 peaks <- import(system.file('extdata', 'merged.peaks.bed.gz',
@@ -266,14 +260,12 @@ The `createDGELists` function will extract counts number from the `quant.sf`
 files and generate a list of `edgeR::DGEList` object. The available choices for
 `select_feature` are 'all', 'exon', 'intron', 'gene', and 'intergenic'.
 Here we use `all` as an example.
-Please note that different from RNA-seq data, the DGEList library size and
-normliazation factor will be determined by `all` feature counts.
 
 ```{r}
 atac_ys <- createDGELists(atac_quant_sfs, atac_qnames, atac_seq_anno,
-                          select_feature = 'all',
+                          select_feature = 'peak',
                           group=sub('.rep.', '', atac_qnames),
-                          norm_level='all',
+                          norm_level='peak',
                           remove.zeros = TRUE)
 names(atac_ys)
 atac_ys[[1]]
@@ -281,7 +273,7 @@ atac_ys[[1]]
 
 ## Analyze results with _edgeR_
 
-```{r, fig.height=3}
+```{r}
 y <- atac_ys[['repName']]
 keep <- filterByExpr(y)
 y <- y[keep, keep.lib.sizes=TRUE]
@@ -298,6 +290,7 @@ EnhancedVolcano(atac_res,
                 subtitle = NULL,
                 legendPosition = 'right'
                 )
+## this is very small test data, we set the cutoff a small number.
 atac_de <- atac_res[abs(atac_res$logFC)>log2(1.5) & atac_res$PValue<0.05, ]
 plotdata <- y$tpm[rownames(atac_de), ]
 pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
@@ -312,6 +305,7 @@ m <- m[order(-1*sign(m$logFC.RNA)*sign(m$logFC.ATAC),
                sqrt(m$PValue.RNA^2 + m$PValue.ATAC^2)), ]
 head(m, n=2)
 head(seq_anno[seq_anno$repName==m[1, 1], ])
+head(atac_seq_anno[atac_seq_anno$repName==m[1, 1], ])
 ```
 
 # SessionInfo
