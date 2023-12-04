@@ -113,7 +113,7 @@ annotation.</p></dd>
 <span class="r-in"><span>           <span class="va">TxDb.Drerio.UCSC.danRer11.refGene</span>,</span></span>
 <span class="r-in"><span>           <span class="va">rmsk</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>some group names are NAs or duplicated</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 8783 rows and 8 columns</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 8783 rows and 9 columns</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     seqname     feature      repName       repClass</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;character&gt; &lt;character&gt;  &lt;character&gt;    &lt;character&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    dd7050e8ed56cd21c9a3..        exon       A-rich Low_complexity</span>
@@ -127,19 +127,32 @@ annotation.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8781 75ab38b962fed592ed30..  intergenic   ENSPM-6_DR            DNA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8782 75ab38b962fed592ed30..  intergenic ERV1-N3-I_DR            LTR</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 8783 7035a5634fcfd9c01b5b..  intergenic      ASAT_CY      Satellite</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           repFamily         N                    idx                     seq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;character&gt; &lt;integer&gt;            &lt;character&gt;          &lt;DNAStringSet&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    Low_complexity         1 chr25:11005150-11005.. AAAGAAGTGT...AGCTGTGCAT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2               DNA         1 chr25:11006165-11006.. AAAGAAGTGT...AGCTGTGCAT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3     Simple_repeat         1 chr25:12689061-12689.. ATGTCCACTG...TTTTATTTGA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4     Simple_repeat         1 chr25:12849652-12849.. TCTGTGAGCC...TAATACTGTT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5     Simple_repeat         1 chr25:13406054-13406.. CAGCAACACA...GATGAAATGA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> ...             ...       ...                    ...                     ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8779     CMC-EnSpm?         1 chr25:14990246-14990.. TGTTTATTTT...GACATTGTAG</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8780     CMC-EnSpm?         1 chr25:14990583-14990.. TTTGAAATAA...ATTTTACAGT</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8781      CMC-EnSpm         1 chr25:14993932-14994.. CTCTCTCATT...TTTGGATGTG</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8782            LTR         1 chr25:14993948-14994.. CTCTCTCATT...TTTGGATGTG</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8783      Satellite         1 chr25:14999170-14999.. TTAACATTTG...GTTTTAAATT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           repFamily         N                    idx      tx_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;character&gt; &lt;integer&gt;            &lt;character&gt;  &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    Low_complexity         1 chr25:11005150-11005.. NM_001327884</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2               DNA         1 chr25:11006165-11006.. NM_001327884</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     Simple_repeat         1 chr25:12689061-12689.. NM_001122702</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     Simple_repeat         1 chr25:12849652-12849.. NM_001128278</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     Simple_repeat         1 chr25:13406054-13406..    NM_200870</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...             ...       ...                    ...          ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8779     CMC-EnSpm?         1 chr25:14990246-14990..           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8780     CMC-EnSpm?         1 chr25:14990583-14990..           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8781      CMC-EnSpm         1 chr25:14993932-14994..           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8782            LTR         1 chr25:14993948-14994..           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8783      Satellite         1 chr25:14999170-14999..           NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                          seq</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               &lt;DNAStringSet&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    AAAGAAGTGT...AGCTGTGCAT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    AAAGAAGTGT...AGCTGTGCAT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    ATGTCCACTG...TTTTATTTGA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    TCTGTGAGCC...TAATACTGTT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    CAGCAACACA...GATGAAATGA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                      ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8779 TGTTTATTTT...GACATTGTAG</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8780 TTTGAAATAA...ATTTTACAGT</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8781 CTCTCTCATT...TTTGGATGTG</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8782 CTCTCTCATT...TTTGGATGTG</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8783 TTAACATTTG...GTTTTAAATT</span>
 </code></pre></div>
     </div>
   </div>

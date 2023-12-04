@@ -202,7 +202,7 @@ export the command by setting <code>dryrun</code> parameter to TRUE.</p>
 <span>                   FaFile<span class="op">=</span><span class="va">rna_outfile</span>,</span>
 <span>                   index<span class="op">=</span><span class="st">'RNA_TEindex'</span>,</span>
 <span>                   dryrun<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/RtmpVHRAQO/file1285f0a120f.fa.gz -i RNA_TEindex</span></span></code></pre>
+<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/RtmpAkzhhz/file19455f3f17a7.fa.gz -i RNA_TEindex</span></span></code></pre>
 <p>Second, we will align reads to salmon index.</p>
 <div class="sourceCode" id="section-cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/alignReadsBySalmon.html">alignReadsBySalmon</a></span><span class="op">(</span><span class="st">'sample1.R1.fq.gz'</span>, <span class="st">'sample1.R2.fq.gz'</span>,</span>
@@ -299,20 +299,14 @@ determined by gene level counts.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="section-quick-start-for-atac-seq-data">Quick start for ATAC-seq data<a class="anchor" aria-label="anchor" href="#section-quick-start-for-atac-seq-data"></a>
+<h2 id="section-quick-start-for-atac-seqchip-seq-data">Quick start for ATAC-seq/ChIP-seq data<a class="anchor" aria-label="anchor" href="#section-quick-start-for-atac-seqchip-seq-data"></a>
 </h2>
 <div class="section level3">
-<h3 id="section-generating-reference-for-atac-seq">Generating reference for ATAC-seq<a class="anchor" aria-label="anchor" href="#section-generating-reference-for-atac-seq"></a>
+<h3 id="section-generating-reference-for-atac-seqchip-seq">Generating reference for ATAC-seq/ChIP-seq<a class="anchor" aria-label="anchor" href="#section-generating-reference-for-atac-seqchip-seq"></a>
 </h3>
-<p>The reference includes:</p>
-<ol style="list-style-type: decimal">
-<li><p>Distinct exon sequences prepared by <code><a href="https://rdrr.io/pkg/Biostrings/man/getSeq.html" class="external-link">BSgenome::getSeq</a></code>
-function for output of <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/transcripts.html" class="external-link">GenomicFeatures::exons</a></code>.</p></li>
-<li><p>Distinct sequences representing RE-containing introns by
-<code><a href="https://rdrr.io/pkg/GenomicFeatures/man/exonicParts.html" class="external-link">GenomicFeatures::intronicParts</a></code>.</p></li>
-<li><p>Distinct RepeatMasker elements in the intergenic region.</p></li>
-</ol>
-<p>For ATAC-seq, to prepare the sequences, the called peaks are
+<p>The reference are distinct sequences representing RE-containing
+peaks.</p>
+<p>For ATAC-seq/ChIP-seq, to prepare the sequences, the called peaks are
 required.</p>
 <div class="sourceCode" id="section-cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rtracklayer</span><span class="op">)</span></span>
@@ -333,7 +327,7 @@ export the command by setting <code>dryrun</code> parameter to TRUE.</p>
 <span>                   FaFile<span class="op">=</span><span class="va">atac_outfile</span>,</span>
 <span>                   index<span class="op">=</span><span class="st">'ATAC_TEindex'</span>,</span>
 <span>                   dryrun<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/RtmpVHRAQO/file128551ad5455.fa.gz -i ATAC_TEindex</span></span></code></pre>
+<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/RtmpAkzhhz/file1945527c6ca9.fa.gz -i ATAC_TEindex</span></span></code></pre>
 <p>Second, we will align reads to salmon index.</p>
 <div class="sourceCode" id="section-cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/alignReadsBySalmon.html">alignReadsBySalmon</a></span><span class="op">(</span><span class="st">'sample1.R1.fq.gz'</span>, <span class="st">'sample1.R2.fq.gz'</span>,</span>
@@ -358,53 +352,51 @@ files.</p>
 from the <code>quant.sf</code> files and generate a list of
 <code><a href="https://rdrr.io/pkg/edgeR/man/DGEList.html" class="external-link">edgeR::DGEList</a></code> object. The available choices for
 <code>select_feature</code> are ‘all’, ‘exon’, ‘intron’, ‘gene’, and
-‘intergenic’. Here we use <code>all</code> as an example. Please note
-that different from RNA-seq data, the DGEList library size and
-normliazation factor will be determined by <code>all</code> feature
-counts.</p>
+‘intergenic’. Here we use <code>all</code> as an example.</p>
 <div class="sourceCode" id="section-cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">atac_ys</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/createDGELists.html">createDGELists</a></span><span class="op">(</span><span class="va">atac_quant_sfs</span>, <span class="va">atac_qnames</span>, <span class="va">atac_seq_anno</span>,</span>
-<span>                          select_feature <span class="op">=</span> <span class="st">'all'</span>,</span>
+<span>                          select_feature <span class="op">=</span> <span class="st">'peak'</span>,</span>
 <span>                          group<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">'.rep.'</span>, <span class="st">''</span>, <span class="va">atac_qnames</span><span class="op">)</span>,</span>
-<span>                          norm_level<span class="op">=</span><span class="st">'all'</span>,</span>
+<span>                          norm_level<span class="op">=</span><span class="st">'peak'</span>,</span>
 <span>                          remove.zeros <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Removing 139 rows with all zero counts</span></span></code></pre>
-<pre><code><span><span class="co">## Removing 1 rows with all zero counts</span></span></code></pre>
-<div class="sourceCode" id="section-cb33"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## Removing 37 rows with all zero counts</span></span></code></pre>
+<div class="sourceCode" id="section-cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">atac_ys</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "repName"   "repClass"  "repFamily"</span></span></code></pre>
-<div class="sourceCode" id="section-cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="section-cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">atac_ys</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">## An object of class "DGEList"</span></span>
 <span><span class="co">## $counts</span></span>
-<span><span class="co">##           Reg.rep1 Reg.rep2 Uni.rep1 Uni.rep2</span></span>
-<span><span class="co">## (A)n       758.042  822.216  646.107  660.581</span></span>
-<span><span class="co">## (AAAT)n      0.000    1.000    0.000    1.000</span></span>
-<span><span class="co">## (AAC)n       0.000    0.989    0.000    0.000</span></span>
-<span><span class="co">## (AACTGA)n  342.003  383.003  324.614  334.387</span></span>
-<span><span class="co">## (AAT)n     408.034  331.100  304.965  320.125</span></span>
-<span><span class="co">## 575 more rows ...</span></span>
+<span><span class="co">##          Reg.rep1 Reg.rep2 Reg.rep3 Uni.rep1 Uni.rep2 Uni.rep3</span></span>
+<span><span class="co">## (A)n       99.994      125  121.979  129.369      106   95.878</span></span>
+<span><span class="co">## (AAA)n      7.000        7    9.000    9.000        8    6.000</span></span>
+<span><span class="co">## (AAAAT)n    4.000        4    2.000    9.000        3    1.000</span></span>
+<span><span class="co">## (AAAC)n     0.000        0    4.000    0.000        1    1.000</span></span>
+<span><span class="co">## (AAAT)n    12.000       16    9.000   18.000        9   10.000</span></span>
+<span><span class="co">## 625 more rows ...</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $samples</span></span>
 <span><span class="co">##          group lib.size norm.factors</span></span>
-<span><span class="co">## Reg.rep1   Reg 248858.0            1</span></span>
-<span><span class="co">## Reg.rep2   Reg 262879.2            1</span></span>
-<span><span class="co">## Uni.rep1   Uni 231958.5            1</span></span>
-<span><span class="co">## Uni.rep2   Uni 238158.1            1</span></span>
+<span><span class="co">## Reg.rep1   Reg 12166.45            1</span></span>
+<span><span class="co">## Reg.rep2   Reg 12340.34            1</span></span>
+<span><span class="co">## Reg.rep3   Reg 12775.16            1</span></span>
+<span><span class="co">## Uni.rep1   Uni 13935.17            1</span></span>
+<span><span class="co">## Uni.rep2   Uni 11293.21            1</span></span>
+<span><span class="co">## Uni.rep3   Uni 11001.10            1</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $tpm</span></span>
-<span><span class="co">##            Reg.rep1   Reg.rep2  Uni.rep1  Uni.rep2</span></span>
-<span><span class="co">## (A)n      547.01449  753.04628 828.20010 813.54697</span></span>
-<span><span class="co">## (AAAT)n     0.00000  128.19506   0.00000 135.77487</span></span>
-<span><span class="co">## (AAC)n      0.00000 1901.43632   0.00000   0.00000</span></span>
-<span><span class="co">## (AACTGA)n  94.26064   99.61734  85.43542  91.94861</span></span>
-<span><span class="co">## (AAT)n    375.63789 2240.41052 286.08757 306.64686</span></span>
-<span><span class="co">## 575 more rows ...</span></span></code></pre>
+<span><span class="co">##            Reg.rep1   Reg.rep2   Reg.rep3   Uni.rep1   Uni.rep2    Uni.rep3</span></span>
+<span><span class="co">## (A)n     6928.11611 6042.92255 4735.13835 6232.70360 6676.89490 5076.559294</span></span>
+<span><span class="co">## (AAA)n     26.39531   24.96572   36.47862   28.37995   32.61850   23.779377</span></span>
+<span><span class="co">## (AAAAT)n   26.38979   27.27461   15.11700   59.20299   23.74255    7.120842</span></span>
+<span><span class="co">## (AAAC)n     0.00000    0.00000 2375.17580    0.00000  704.50618  680.073838</span></span>
+<span><span class="co">## (AAAT)n   616.20410  586.90275  312.54305  369.62323  305.60154  121.613880</span></span>
+<span><span class="co">## 625 more rows ...</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="section-analyze-results-with-edger-1">Analyze results with <em>edgeR</em><a class="anchor" aria-label="anchor" href="#section-analyze-results-with-edger-1"></a>
 </h3>
-<div class="sourceCode" id="section-cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="section-cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">atac_ys</span><span class="op">[[</span><span class="st">'repName'</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/filterByExpr.html" class="external-link">filterByExpr</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[</span><span class="va">keep</span>, keep.lib.sizes<span class="op">=</span><span class="cn">TRUE</span><span class="op">]</span></span>
@@ -422,8 +414,9 @@ counts.</p>
 <span>                legendPosition <span class="op">=</span> <span class="st">'right'</span></span>
 <span>                <span class="op">)</span></span></code></pre></div>
 <p><img src="ratte_files/figure-html/unnamed-chunk-19-1.png" width="576"></p>
-<div class="sourceCode" id="section-cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">atac_de</span> <span class="op">&lt;-</span> <span class="va">atac_res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">atac_res</span><span class="op">$</span><span class="va">logFC</span><span class="op">)</span><span class="op">&gt;</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">atac_res</span><span class="op">$</span><span class="va">PValue</span><span class="op">&lt;</span><span class="fl">0.05</span>, <span class="op">]</span></span>
+<div class="sourceCode" id="section-cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## this is very small test data, we set the cutoff a small number.</span></span>
+<span><span class="va">atac_de</span> <span class="op">&lt;-</span> <span class="va">atac_res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">atac_res</span><span class="op">$</span><span class="va">logFC</span><span class="op">)</span><span class="op">&gt;</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">atac_res</span><span class="op">$</span><span class="va">PValue</span><span class="op">&lt;</span><span class="fl">0.05</span>, <span class="op">]</span></span>
 <span><span class="va">plotdata</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">$</span><span class="va">tpm</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">atac_de</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/pheatmap/man/pheatmap.html" class="external-link">pheatmap</a></span><span class="op">(</span><span class="va">plotdata</span>, scale <span class="op">=</span> <span class="st">'row'</span>, cluster_cols <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="ratte_files/figure-html/unnamed-chunk-19-2.png" width="576"></p>
@@ -432,42 +425,69 @@ counts.</p>
 <div class="section level2">
 <h2 id="section-merge-the-results-from-rna-seq-and-atac-seq">Merge the results from RNA-seq and ATAC-seq<a class="anchor" aria-label="anchor" href="#section-merge-the-results-from-rna-seq-and-atac-seq"></a>
 </h2>
-<div class="sourceCode" id="section-cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="section-cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">res</span>, <span class="va">atac_res</span>, suffixes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".RNA"</span>,<span class="st">".ATAC"</span><span class="op">)</span>,</span>
 <span>           by<span class="op">=</span><span class="st">'row.names'</span><span class="op">)</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">logFC.RNA</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">logFC.ATAC</span><span class="op">)</span>, </span>
 <span>               <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">PValue.RNA</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">m</span><span class="op">$</span><span class="va">PValue.ATAC</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">m</span>, n<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##         Row.names logFC.RNA logCPM.RNA   LR.RNA  PValue.RNA    FDR.RNA</span></span>
-<span><span class="co">## 54     DIRS-15_DR -1.260937   10.65210 7.941606 0.004831094 0.01514989</span></span>
-<span><span class="co">## 144 Mariner-N5_DR -1.281433   10.82231 9.597140 0.001948807 0.01053574</span></span>
-<span><span class="co">##     logFC.ATAC logCPM.ATAC  LR.ATAC PValue.ATAC   FDR.ATAC</span></span>
-<span><span class="co">## 54  -0.2632025     9.99593 8.000676 0.004675988 0.09713198</span></span>
-<span><span class="co">## 144 -0.1369858    11.75537 7.019590 0.008062267 0.09713198</span></span></code></pre>
-<div class="sourceCode" id="section-cb41"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">##      Row.names  logFC.RNA logCPM.RNA   LR.RNA   PValue.RNA     FDR.RNA</span></span>
+<span><span class="co">## 42  DNA-8-9_DR -0.7980290   11.77132  6.37657 0.0115636712 0.026322567</span></span>
+<span><span class="co">## 63 EnSpm-N6_DR -0.6830132   13.44644 10.96948 0.0009262468 0.005525541</span></span>
+<span><span class="co">##    logFC.ATAC logCPM.ATAC  LR.ATAC PValue.ATAC  FDR.ATAC</span></span>
+<span><span class="co">## 42 -0.3725652    12.19434 5.480980  0.01922448 0.4170233</span></span>
+<span><span class="co">## 63 -0.9431652    10.05091 5.103809  0.02387336 0.4301874</span></span></code></pre>
+<div class="sourceCode" id="section-cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">seq_anno</span><span class="op">[</span><span class="va">seq_anno</span><span class="op">$</span><span class="va">repName</span><span class="op">==</span><span class="va">m</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## DataFrame with 6 rows and 8 columns</span></span>
+<pre><code><span><span class="co">## DataFrame with 6 rows and 9 columns</span></span>
 <span><span class="co">##                  seqname     feature     repName    repClass   repFamily</span></span>
 <span><span class="co">##              &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">## 1 6f9e6fe1e4efb369c29c..      intron  DIRS-15_DR         LTR       Ngaro</span></span>
-<span><span class="co">## 2 ff1ddbaa96922149aeb3..  intergenic  DIRS-15_DR         LTR       Ngaro</span></span>
-<span><span class="co">## 3 7c6a1e4430f8eed7a669..  intergenic  DIRS-15_DR         LTR       Ngaro</span></span>
-<span><span class="co">## 4 e78ec63e8c31d44a9387..  intergenic  DIRS-15_DR         LTR       Ngaro</span></span>
-<span><span class="co">## 5 da2b9f4bb6f238c3c84c..  intergenic  DIRS-15_DR         LTR       Ngaro</span></span>
-<span><span class="co">## 6 200174837548a59bfeca..  intergenic  DIRS-15_DR         LTR       Ngaro</span></span>
-<span><span class="co">##           N                    idx                     seq</span></span>
-<span><span class="co">##   &lt;integer&gt;            &lt;character&gt;          &lt;DNAStringSet&gt;</span></span>
-<span><span class="co">## 1         1 chr25:14255135-14255.. GTCAGTGATC...TTCCCACCAG</span></span>
-<span><span class="co">## 2         1 chr25:12588233-12588.. GAGAGAAGCA...ACCAGGCGGG</span></span>
-<span><span class="co">## 3         1 chr25:13719473-13719.. CTTGGTTATG...CCAGTCACTG</span></span>
-<span><span class="co">## 4         1 chr25:14323030-14323.. TACGGACAAT...TACCTACTAC</span></span>
-<span><span class="co">## 5         1 chr25:14484863-14484.. CAGCGTTGGG...CCCAACACTG</span></span>
-<span><span class="co">## 6         1 chr25:14867720-14867.. GGGCGTCACT...TCGCACCCTG</span></span></code></pre>
+<span><span class="co">## 1 e7b2400cc9f303582e8d..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 2 a3482d5dfc7994ca57dc..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 3 b5bc5a06d7fe994c32cf..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 4 633c41ea5abc604a0f54..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 5 e76f7d6b0d501f6bd997..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 6 dab0e247e710af6140ed..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">##           N                    idx                tx_name</span></span>
+<span><span class="co">##   &lt;integer&gt;            &lt;character&gt;            &lt;character&gt;</span></span>
+<span><span class="co">## 1         1 chr25:14166077-14166..           NM_001128347</span></span>
+<span><span class="co">## 2         2 chr25:14251818-14251.. NM_001128347,NM_0011..</span></span>
+<span><span class="co">## 3         1 chr25:14879440-14879..              NM_200452</span></span>
+<span><span class="co">## 4         1 chr25:11941291-11941..           NM_001256664</span></span>
+<span><span class="co">## 5         2 chr25:12061702-12061.. NM_001256664,NM_0012..</span></span>
+<span><span class="co">## 6         1 chr25:13092036-13092..           NM_001122750</span></span>
+<span><span class="co">##                       seq</span></span>
+<span><span class="co">##            &lt;DNAStringSet&gt;</span></span>
+<span><span class="co">## 1 GTGCGTACAC...TTTTTGCCAG</span></span>
+<span><span class="co">## 2 GTGAGTTGAA...TCTTTCCCAG</span></span>
+<span><span class="co">## 3 GTAGGTGTTC...TGATTGGCAG</span></span>
+<span><span class="co">## 4 GTAAGCAAGT...CTCTTCGCAG</span></span>
+<span><span class="co">## 5 GTGAGTCCTG...TCCCCTGCAG</span></span>
+<span><span class="co">## 6 GTAAGAGCTC...TTTTGTGCAG</span></span></code></pre>
+<div class="sourceCode" id="section-cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">atac_seq_anno</span><span class="op">[</span><span class="va">atac_seq_anno</span><span class="op">$</span><span class="va">repName</span><span class="op">==</span><span class="va">m</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## DataFrame with 6 rows and 9 columns</span></span>
+<span><span class="co">##                  seqname     feature     repName    repClass   repFamily</span></span>
+<span><span class="co">##              &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
+<span><span class="co">## 1 4f471f3c7c118eeb7ddb..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 2 6a837e21d38fa0082c0f..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 3 ff2e591b5fc41b6cff86..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 4 0929655c4ade7d453989..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 5 b2ec5656f2053898434e..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 6 ee081dff4dfbe18cb247..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">##           N                    idx      tx_name                     seq</span></span>
+<span><span class="co">##   &lt;integer&gt;            &lt;character&gt;  &lt;character&gt;          &lt;DNAStringSet&gt;</span></span>
+<span><span class="co">## 1         1 chr25:11030723-11030.. NM_001265607 AAAATGCTTT...ATTAGTGTAG</span></span>
+<span><span class="co">## 2         1 chr25:11324782-11325.. NM_001265607 GGCACTTGTG...ACATATTTAT</span></span>
+<span><span class="co">## 3         1 chr25:11358819-11358.. NM_001265607 GATGTCTCCT...GTAGGTCTTA</span></span>
+<span><span class="co">## 4         1 chr25:12255981-12256.. NM_001256664 ACTTTCCTTC...GCCAACTGAC</span></span>
+<span><span class="co">## 5         1 chr25:12322481-12322..    NM_199670 TTTTTTGTTG...TCGCTGGTTC</span></span>
+<span><span class="co">## 6         1 chr25:12322481-12322..    NM_199670 GTTCGCGTGG...GTGTGTGAAT</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="section-sessioninfo">SessionInfo<a class="anchor" aria-label="anchor" href="#section-sessioninfo"></a>
 </h2>
-<div class="sourceCode" id="section-cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="section-cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R Under development (unstable) (2023-11-22 r85609)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
@@ -521,19 +541,19 @@ counts.</p>
 <span><span class="co">## [26] BiocStyle_2.31.0                       </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] RColorBrewer_1.1-3            jsonlite_1.8.7               </span></span>
+<span><span class="co">##   [1] RColorBrewer_1.1-3            jsonlite_1.8.8               </span></span>
 <span><span class="co">##   [3] magrittr_2.0.3                farver_2.1.1                 </span></span>
 <span><span class="co">##   [5] rmarkdown_2.25                fs_1.6.3                     </span></span>
 <span><span class="co">##   [7] zlibbioc_1.49.0               ragg_1.2.6                   </span></span>
-<span><span class="co">##   [9] vctrs_0.6.4                   memoise_2.0.1                </span></span>
+<span><span class="co">##   [9] vctrs_0.6.5                   memoise_2.0.1                </span></span>
 <span><span class="co">##  [11] Rsamtools_2.19.2              RCurl_1.98-1.13              </span></span>
-<span><span class="co">##  [13] htmltools_0.5.7               S4Arrays_1.3.0               </span></span>
+<span><span class="co">##  [13] htmltools_0.5.7               S4Arrays_1.3.1               </span></span>
 <span><span class="co">##  [15] progress_1.2.2                curl_5.1.0                   </span></span>
 <span><span class="co">##  [17] SparseArray_1.3.1             sass_0.4.7                   </span></span>
-<span><span class="co">##  [19] bslib_0.6.0                   desc_1.4.2                   </span></span>
+<span><span class="co">##  [19] bslib_0.6.1                   desc_1.4.2                   </span></span>
 <span><span class="co">##  [21] cachem_1.0.8                  GenomicAlignments_1.39.0     </span></span>
 <span><span class="co">##  [23] mime_0.12                     lifecycle_1.0.4              </span></span>
-<span><span class="co">##  [25] pkgconfig_2.0.3               Matrix_1.6-3                 </span></span>
+<span><span class="co">##  [25] pkgconfig_2.0.3               Matrix_1.6-4                 </span></span>
 <span><span class="co">##  [27] R6_2.5.1                      fastmap_1.1.1                </span></span>
 <span><span class="co">##  [29] GenomeInfoDbData_1.2.11       MatrixGenerics_1.15.0        </span></span>
 <span><span class="co">##  [31] shiny_1.8.0                   digest_0.6.33                </span></span>
@@ -552,14 +572,14 @@ counts.</p>
 <span><span class="co">##  [57] promises_1.2.1                grid_4.4.0                   </span></span>
 <span><span class="co">##  [59] generics_0.1.3                gtable_0.3.4                 </span></span>
 <span><span class="co">##  [61] tzdb_0.4.0                    data.table_1.14.8            </span></span>
-<span><span class="co">##  [63] hms_1.1.3                     xml2_1.3.5                   </span></span>
+<span><span class="co">##  [63] hms_1.1.3                     xml2_1.3.6                   </span></span>
 <span><span class="co">##  [65] utf8_1.2.4                    BiocVersion_3.19.1           </span></span>
 <span><span class="co">##  [67] pillar_1.9.0                  stringr_1.5.1                </span></span>
 <span><span class="co">##  [69] later_1.3.1                   splines_4.4.0                </span></span>
 <span><span class="co">##  [71] dplyr_1.1.4                   lattice_0.22-5               </span></span>
 <span><span class="co">##  [73] bit_4.0.5                     tidyselect_1.2.0             </span></span>
 <span><span class="co">##  [75] locfit_1.5-9.8                knitr_1.45                   </span></span>
-<span><span class="co">##  [77] bookdown_0.36                 SummarizedExperiment_1.33.0  </span></span>
+<span><span class="co">##  [77] bookdown_0.37                 SummarizedExperiment_1.33.1  </span></span>
 <span><span class="co">##  [79] xfun_0.41                     statmod_1.5.0                </span></span>
 <span><span class="co">##  [81] matrixStats_1.1.0             stringi_1.8.2                </span></span>
 <span><span class="co">##  [83] yaml_2.3.7                    evaluate_0.23                </span></span>
@@ -568,11 +588,11 @@ counts.</p>
 <span><span class="co">##  [89] xtable_1.8-4                  systemfonts_1.0.5            </span></span>
 <span><span class="co">##  [91] munsell_0.5.0                 jquerylib_0.1.4              </span></span>
 <span><span class="co">##  [93] Rcpp_1.0.11                   png_0.1-8                    </span></span>
-<span><span class="co">##  [95] XML_3.99-0.15                 parallel_4.4.0               </span></span>
+<span><span class="co">##  [95] XML_3.99-0.16                 parallel_4.4.0               </span></span>
 <span><span class="co">##  [97] ellipsis_0.3.2                pkgdown_2.0.7                </span></span>
 <span><span class="co">##  [99] readr_2.1.4                   blob_1.2.4                   </span></span>
 <span><span class="co">## [101] prettyunits_1.2.0             bitops_1.0-7                 </span></span>
-<span><span class="co">## [103] scales_1.2.1                  purrr_1.0.2                  </span></span>
+<span><span class="co">## [103] scales_1.3.0                  purrr_1.0.2                  </span></span>
 <span><span class="co">## [105] crayon_1.5.2                  rlang_1.1.2                  </span></span>
 <span><span class="co">## [107] KEGGREST_1.43.0</span></span></code></pre>
 </div>
