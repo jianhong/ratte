@@ -166,13 +166,13 @@ qnames <- sub("^.*\\/(.*?).quant.sf", "\\1", quant_sfs)
 The `createDGELists` function will extract counts number from the `quant.sf`
 files and generate a list of `edgeR::DGEList` object. The available choices for
 `select_feature` are 'all', 'exon', 'intron', 'gene', and 'intergenic'.
-Here we use `all` as an example.
+Here we use `gene` as an example.
 Please note that the DGEList library size and normliazation factor will be
 determined by gene level counts.
 
 ```{r}
 ys <- createDGELists(quant_sfs, qnames, seq_anno,
-                     select_feature = 'all',
+                     select_feature = 'gene',
                      group=sub('.rep.', '', qnames),
                      remove.zeros = TRUE)
 names(ys)
@@ -298,6 +298,7 @@ pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
 
 # Merge the results from RNA-seq and ATAC-seq
 
+## For repeat elements level
 ```{r}
 m <- merge(res, atac_res, suffixes = c(".RNA",".ATAC"),
            by='row.names')
@@ -306,6 +307,37 @@ m <- m[order(-1*sign(m$logFC.RNA)*sign(m$logFC.ATAC),
 head(m, n=2)
 head(seq_anno[seq_anno$repName==m[1, 1], ])
 head(atac_seq_anno[atac_seq_anno$repName==m[1, 1], ])
+```
+
+## For transcripts level
+
+```{r}
+DE <- function(y){
+  keep <- filterByExpr(y)
+  y <- y[keep, keep.lib.sizes=TRUE]
+  design <- model.matrix(~y$samples$group)
+  y <- estimateDisp(y, design)
+  fit <- glmFit(y, design)
+  lrt <- glmLRT(fit, coef=2)
+  res <- as.data.frame(topTags(lrt, n=nrow(lrt)))
+  ## for ATAC-seq/ChIP-seq, the tx_name were annotated by the nearest
+  ## transcript, you may want to change this with other annotation.
+  tx_name <- strsplit(res$tx_name, split=',')
+  tx_name <- lapply(tx_name, unique)
+  res <- res[rep(seq.int(nrow(res)), lengths(tx_name)), ]
+  res$tx_name <- unlist(tx_name)
+  res
+}
+tx.RNA <- DE(ys[['rawCounts']])
+tx.ATAC <- DE(atac_ys[['rawCounts']])
+head(tx.RNA[, colnames(tx.RNA)!='seq'], n=2)
+head(tx.ATAC[, colnames(tx.ATAC)!='seq'], n=2)
+tx_level <- merge(tx.RNA, tx.ATAC,
+                  by=c('repName', 'repClass', 'repFamily', 'tx_name'),
+                  suffix=c('.RNA', '.ATAC'))
+tx_level[1:2, c('tx_name', 'repName', 'feature.RNA',
+                'logFC.RNA', 'PValue.RNA', 'FDR.RNA',
+                'logFC.ATAC', 'PValue.ATAC', 'FDR.ATAC')]
 ```
 
 # SessionInfo

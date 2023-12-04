@@ -3,7 +3,7 @@ Type: Package
 Title:
     Integrating RNA-seq and ATAC-seq for
     the Annotation of Transposable Elements
-Version: 0.0.3
+Version: 0.0.4
 Encoding: UTF-8
 Authors@R:
     c(person(given = "Jianhong",

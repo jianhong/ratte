@@ -16,7 +16,7 @@ rollup_one_RE <- function(quant_sf, seq_anno){
   qsf <- qsf[, .globals$quantSfColName]
   seqCnts <- as.data.frame(seq_anno) %>%
     left_join(qsf, by=c("seqname"="Name"))
-  repCnts <- lapply(.globals$repColNames, FUN = function(.col){
+  repCnts <- lapply(.globals$repColNamesRollup, FUN = function(.col){
     seqCnts %>%
       group_by_at(.vars=.col) %>%
       summarize_at(.globals$quantSfColName[-1], sum, na.rm=TRUE) %>%
@@ -92,7 +92,7 @@ rollup_RE <- function(quant_sfs, qnames, seq_anno,
   stopifnot("Rownames of quant file are not identical."=all(rn_identical))
   coln <- .globals$quantSfColName[-1]
   se <- lapply(coln, FUN = function(.col){
-    lapply(.globals$repColNames, FUN = function(.repN){
+    lapply(.globals$repColNamesRollup, FUN = function(.repN){
       x <- do.call(cbind, lapply(se, FUN = function(.ele){
         .ele[[.repN]][, .col, drop=FALSE]
       }))
@@ -161,7 +161,8 @@ createDGELists <- function(quant_sfs, qnames, seq_anno,
     match.arg(norm_level,
               choices = .globals$feature_types_choices)
   re <- rollup_RE(quant_sfs, qnames, seq_anno, select_feature, cpus)
-  if(!norm_level %in% seq_anno$feature){
+  if(!norm_level %in% seq_anno$feature &&
+     !(norm_level=='gene' && any(c('exon', 'intron') %in% seq_anno$feature))){
     warning(norm_level, ' is not available in the annotation. Use "all".')
     norm_level <- 'all'
   }
@@ -170,7 +171,7 @@ createDGELists <- function(quant_sfs, qnames, seq_anno,
   }else{
     re_gene <- re
   }
-  y <- lapply(.globals$repColNames, function(.col){
+  y <- lapply(.globals$repColNamesRollup, function(.col){
     .n <- paste(.globals$quantSfColName[3], .col, sep=".")
     dots <- list(...)
     dots$counts <- re[[.n]]
@@ -181,9 +182,17 @@ createDGELists <- function(quant_sfs, qnames, seq_anno,
       dots$normFactors <- calcNormFactors(object = re_gene[[.n]],
                                           method = norm_method)
     }
+    if(.col=='seqname'){
+      dots$gene <- seq_anno[match(rownames(dots$counts),
+                                  seq_anno$seqname), , drop=FALSE]
+      rownames(dots$gene) <- dots$gene[, 1]
+      dots$gene <- dots$gene[, -1, drop=FALSE]
+    }
     dgel <- do.call(DGEList, dots)
     dgel$tpm <- re[[paste(.globals$quantSfColName[2],
                           .col, sep=".")]][rownames(dgel), ]
     dgel
   })
+  names(y)[names(y)=='seqname'] <- 'rawCounts'
+  y
 }
