@@ -10,6 +10,7 @@ prepareSalmonIndex(
   FaFile = "rmsk.fa.gz",
   index = "TEindex",
   dryrun = TRUE,
+  additionalParameters = "-n",
   ...
 )
 }
@@ -23,6 +24,10 @@ prepareSalmonIndex(
 \item{index}{Output index folder.}
 
 \item{dryrun}{If true, print the command only.}
+
+\item{additionalParameters}{Additional parameters for salmon index.
+By default '-n' will close the poly-A clip. If you did not remove
+the poly-A in \link{prepareSeq} function, please remove '-n' parameter.}
 
 \item{...}{Parameters passed to system2.}
 }

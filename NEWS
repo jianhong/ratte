@@ -1,3 +1,8 @@
+NEW FEATURES IN VERSION 0.0.5
+------------------------
+
+     o Fix a bug for real run of salmon for single end reads.
+     
 NEW FEATURES IN VERSION 0.0.4
 ------------------------
 

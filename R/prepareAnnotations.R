@@ -89,6 +89,9 @@ saveFasta <- function(seq, filepath='rmsk.fa.gz'){
 #' @param FaFile The fasta file.
 #' @param index Output index folder.
 #' @param dryrun If true, print the command only.
+#' @param additionalParameters Additional parameters for salmon index.
+#' By default '-n' will close the poly-A clip. If you did not remove
+#' the poly-A in \link{prepareSeq} function, please remove '-n' parameter.
 #' @param ... Parameters passed to system2.
 #' @return If dryrun is false, the output of system2.
 #' @export
@@ -100,9 +103,11 @@ prepareSalmonIndex <- function(salmonPath='salmon',
                                FaFile='rmsk.fa.gz',
                                index='TEindex',
                                dryrun=TRUE,
+                               additionalParameters='-n',
                                ...){
   stopifnot(is.numeric(cpus))
-  args <- c('index', '--threads', cpus, '-t', FaFile, '-i', index)
+  args <- c('index', '--threads', cpus, '-t', FaFile, '-i', index,
+            additionalParameters)
   if(dryrun){
     cmd <- paste(args, collapse = " ")
     message(salmonPath, " ", cmd)
@@ -157,7 +162,6 @@ alignReadsBySalmon <- function(R1, R2, output,
     message(salmonPath, " ", cmd)
   }else{
     stopifnot(file.exists(R1))
-    stopifnot(file.exists(R2))
     system2(command=salmonPath,
             args = args,
             ...)
