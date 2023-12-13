@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ratte</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.5</span>
       </span>
     </div>
 
@@ -59,6 +59,7 @@
 <span>  FaFile <span class="op">=</span> <span class="st">"rmsk.fa.gz"</span>,</span>
 <span>  index <span class="op">=</span> <span class="st">"TEindex"</span>,</span>
 <span>  dryrun <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  additionalParameters <span class="op">=</span> <span class="st">"-n"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -85,6 +86,12 @@
 <dd><p>If true, print the command only.</p></dd>
 
 
+<dt>additionalParameters</dt>
+<dd><p>Additional parameters for salmon index.
+By default '-n' will close the poly-A clip. If you did not remove
+the poly-A in <a href="prepareSeq.html">prepareSeq</a> function, please remove '-n' parameter.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Parameters passed to system2.</p></dd>
 
@@ -99,7 +106,7 @@
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">prepareSalmonIndex</span><span class="op">(</span><span class="st">'salmon'</span>, dryrun<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> salmon index --threads 2 -t rmsk.fa.gz -i TEindex</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> salmon index --threads 2 -t rmsk.fa.gz -i TEindex -n</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
