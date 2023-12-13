@@ -12,7 +12,6 @@ output:
     toc: true
     toc_float: true
     toc_depth: 4
-runtime: shiny
 ---
 
 ```{r, echo=FALSE, results="hide", warning=FALSE, message=FALSE}
