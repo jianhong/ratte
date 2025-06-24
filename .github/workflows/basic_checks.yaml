@@ -3,7 +3,7 @@ name: Check and build
 on: [push, pull_request]
 
 env:
-  cache-version: v1
+  cache-version: v4
 
 jobs:
   r-build-and-check:
@@ -13,7 +13,7 @@ jobs:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Query dependencies and update old packages
         run: |

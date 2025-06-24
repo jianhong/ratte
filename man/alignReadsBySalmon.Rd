@@ -33,7 +33,7 @@ Please note that this whitelist should not be the full list provided by 10x
 etc. It should be the barcodes.tsv.gz before or after filtering by
 cellRange or other tools. The tool will remove the suffix from each line in
 the barcode file and export to a new uncompressed in named as
-\$output.barcodes.tsv}
+output.barcodes.tsv}
 
 \item{salmonPath}{The path to salmon executable file.}
 

@@ -133,7 +133,7 @@ prepareSalmonIndex <- function(salmonPath='salmon',
 #' etc. It should be the barcodes.tsv.gz before or after filtering by
 #' cellRange or other tools. The tool will remove the suffix from each line in 
 #' the barcode file and export to a new uncompressed in named as
-#' \$output.barcodes.tsv
+#' output.barcodes.tsv
 #' @param salmonPath The path to salmon executable file.
 #' @param cpus Threads number.
 #' @param index Output index folder.
