@@ -1,45 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://jianhong.github.io/ratte/404.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/articles/ratte.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/alignReadsBySalmon.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/createDGELists.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/prepareREannotation.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/prepareSalmonIndex.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/prepareSeq.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/rollup_RE.html</loc>
-  </url>
-  <url>
-    <loc>https://jianhong.github.io/ratte/reference/saveFasta.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://jianhong.github.io/ratte/404.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/LICENSE-text.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/articles/index.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/articles/ratte.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/authors.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/index.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/alignReadsBySalmon.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/createDGELists.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/index.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/prepareREannotation.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/prepareSalmonIndex.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/prepareSeq.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/rollup_RE.html</loc></url>
+<url><loc>https://jianhong.github.io/ratte/reference/saveFasta.html</loc></url>
 </urlset>
+
