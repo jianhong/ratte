@@ -46,7 +46,7 @@ the _ratte_ package has been devised. This package leverages the resources
 available within the Bioconductor community to prepare the necessary sequence
 files and annotations.
 
-# Quick start for RNA-seq data
+# Quick start for RNA-seq or scRNA-seq data
 
 Here is an example using _ratte_ with a subset of RNA-seq data.
 
@@ -56,7 +56,7 @@ First, install _ratte_ and other packages required to run
 the examples.
 Please note that the example dataset used here is from zebrafish.
 To run analysis with dataset from a different species or different assembly,
-please install the corresponding Bsgenome and TxDb.
+please install the corresponding BSgenome and TxDb.
 For example, to analyze mouse data aligned to mm10, please install `BSgenome.Mmusculus.UCSC.mm10`, and `TxDb.Mmusculus.UCSC.mm10.knownGene`.
 You can also generate a TxDb object by functions `makeTxDbFromGFF` from
 a local gff file, or `makeTxDbFromUCSC`, `makeTxDbFromBiomart`, and
@@ -129,9 +129,21 @@ seq_anno <- prepareSeq(genome, txdb, rmsk,
 ## The subsetGRanges parameter is only used for subset the genome.
 ## Please remove this parameter for full fish genome.
                        subsetGRanges=GRanges('chr25:11000000-15000000'))
+## Please note that the seq_anno will be used in later. 
+## It will be good to save it as an R object by
+## saveRDS(seq_anno, 'seq_anno.rds')
 rna_outfile <- tempfile(fileext='.fa.gz')
 saveFasta(seq_anno, rna_outfile)
 ```
+
+For single cell RNA-seq data, a transcript to gene map file is required.
+```{r, eval=FALSE}
+seq2name <- data.frame(s=seq_anno$seqname, n=seq_anno$repName)
+write.table(seq2name, 'seq2name.tsv',
+            row.names = FALSE, col.names = FALSE, quote = FALSE,
+            sep = '\t')
+```
+
 
 ## Align reads by salmon
 
@@ -151,6 +163,18 @@ alignReadsBySalmon('sample1.R1.fq.gz', 'sample1.R2.fq.gz',
                     index='RNA_TEindex',
                     dryrun=TRUE)
 ```
+
+For single cell data, there are multiple additional parameters are required.
+```{r eval=FALSE}
+alignReadsBySalmon('sample1.R1.fq.gz', 'sample1.R2.fq.gz',
+                   output='sample1_salmon_output',
+                   index='RNA_TEindex',
+                   singlecell_protocol = 'chromiumV3',## if your 10x kit ver >= 3 
+                   tgMap='seq2name.tsv', ## saved by previous step
+                   whitelist='cellRanger/outs/filtered_feature_bc_matrix/barcodes.tsv.gz',
+                   dryrun=TRUE)
+```
+
 
 Once alignment is done, we will get quantification file named as `quant.sf`.
 In this manual, we will load pre-aligned files.
@@ -206,6 +230,56 @@ de <- res[abs(res$logFC)>2 & res$FDR<0.05, ]
 plotdata <- y$tpm[rownames(de), ]
 pheatmap(plotdata, scale = 'row', cluster_cols = FALSE)
 ```
+
+## Aggregate counts for scRNA-seq
+
+We will use `tximeta` to import the counts number for the alevin quants. 
+And downstream will treat it same as single cell RNA-seq data with the tools
+such as Seurat or scanpy.
+
+```{r eval=FALSE}
+library(tximeta)
+library(SummarizedExperiment)
+library(Seurat)
+library(ggplot2)
+quants_files <- dir('alevin_output', 'quants_mat.gz',
+                    recursive = TRUE, full.names = TRUE)
+names(quants_files) <- c('WT1', 'WT2', 'KD3', 'KD4')
+se <- lapply(quants_files, tximeta, type='alevin')
+seu <- mapply(se, names(se), FUN=function(.ele, .name){
+  CreateSeuratObject(counts = assays(.ele)$counts,
+                     project = .name,
+                     min.cells = 0, min.features = 0)
+})
+## simple merge
+seu <- merge(seu[[1]], seu[-1])
+## filter cells
+p <- VlnPlot(seu, features=c("nFeature_RNA", "nCount_RNA"))
+ggsave("QC.pdf", plot=p, width=7, height=7)
+seu <- subset(seu, subset=nFeature_RNA > 200 & nCount_RNA<30000)
+p <- VlnPlot(seu, features=c("nFeature_RNA", "nCount_RNA"))
+ggsave("QC2.pdf", plot=p, width=7, height=7)
+## standard pipeline
+seu <- NormalizeData(seu, normalization.method = "LogNormalize")
+seu <- FindVariableFeatures(seu, selection.method = "vst", nfeatures = 3000)
+seu <- ScaleData(seu)
+seu <- RunPCA(seu, features = VariableFeatures(object = seu))
+seu$group <- ifelse(grepl('WT', seu$orig.ident), 'WT', 'KD')
+Idents(seu) <- "group"
+head(Idents(seu))## confirm the idents.
+seu <- JoinLayers(seu)
+markers <- FindMarkers(seu, ident.1='WT', ident.2='KD')
+write.csv(markers, 'TE.DE.csv')
+## psuedobulk
+pseudo_ <- AggregateExpression(seu, assays="RNA",
+                               return.seurat=TRUE,
+                               group.by='orig.ident')
+pseudo_$group <- ifelse(grepl('WT', pseudo_$orig.ident), 'WT', 'KD')
+Idents(pseudo_) <- 'group'
+bulk_markers <- FindMarkers(pseudo_, ident.1 = 'WT', ident.2 = 'KD',
+                            test.use="DESeq2", min.cells.group = 2)
+```
+
 
 # Quick start for ATAC-seq/ChIP-seq data
 

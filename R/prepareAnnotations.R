@@ -124,10 +124,23 @@ prepareSalmonIndex <- function(salmonPath='salmon',
 #' Run salmon quant command for the given fastqs.
 #' @param R1,R2 The R1 and/or R2 reads file path.
 #' @param output The output folder for salmon.
+#' @param singlecell_protocol If it is single cell data, please set it to
+#'  dropseq / chromium / chromiumV3 depending on the type of
+#'  single-cell protocol.
+#' @param whitelist This is an optional argument, where user can explicitly 
+#' specify the whitelist CB to use for cell detection and CB sequence correction.
+#' Please note that this whitelist should not be the full list provided by 10x
+#' etc. It should be the barcodes.tsv.gz before or after filtering by
+#' cellRange or other tools. The tool will remove the suffix from each line in 
+#' the barcode file and export to a new uncompressed in named as
+#' \$output.barcodes.tsv
 #' @param salmonPath The path to salmon executable file.
 #' @param cpus Threads number.
 #' @param index Output index folder.
 #' @param dryrun If true, print the command only.
+#' @param tgMap The file name for the seqnames. It is a tsv file with 2 columns
+#' without header. Both columns are the identical content for the reads names
+#' in the rmsk fasta file. See vignettes for help.
 #' @param ... Parameters passed to system2.
 #' @return If dryrun is false, the output of system2.
 #' @export
@@ -137,26 +150,57 @@ prepareSalmonIndex <- function(salmonPath='salmon',
 #'                    dryrun=TRUE)
 #' 
 alignReadsBySalmon <- function(R1, R2, output,
+                               singlecell_protocol,
+                               whitelist,
                                salmonPath='salmon',
                                cpus=2,
                                index='TEindex',
                                dryrun=TRUE,
+                               tgMap='seq2name.tsv',
                                ...){
   stopifnot(is.numeric(cpus))
   if(missing(R1) || missing(output)){
     stop('R1 and output is requred.')
   }
-  args <- c('quant', '--seqBias', '--gcBias', 
-            '--index', index,
-            '--libType', 'A',
-            '--validateMappings',
-            '--threads', cpus,
-            '-o', output)
-  if(missing(R2)){
-    args <- c(args, '--unmatedReads', R1)
-  }else{
-    args <- c(args, '-1', R1, '-2', R2)
+  if(!missing(singlecell_protocol)){
+    singlecell_protocol <- match.arg(singlecell_protocol,
+                                     c("dropseq", "chromium",
+                                       "chromiumV3"))
+    args <- c('alevin', '-l', 'ISR')
+    if(missing(R2)){
+      stop('R2 is required for single cell data.')
+    }else{
+      args <- c(args, '-1', R1, '-2', R2)
+    }
+    args <- c(args,
+              paste0('--', singlecell_protocol),
+              '-i', index,
+              '-p', cpus,
+              '-o', output,
+              '--tgMap', tgMap)
+    if(!missing(whitelist)){
+      whitelist <- readLines(whitelist)
+      whitelist <- gsub('[^ACGT]', '', whitelist)
+      dir.create(output, recursive = TRUE, showWarnings = FALSE)
+      wln <- paste0(output, '.barcode.tsv')
+      writeLines(whitelist, wln)
+      args <- c(args, '--whitelist', wln)
+    }
+  } else{
+    args <- c('quant', '--seqBias', '--gcBias', 
+              '--index', index,
+              '--libType', 'A',
+              '--validateMappings',
+              '--threads', cpus,
+              '-o', output)
+    if(missing(R2)){
+      args <- c(args, '--unmatedReads', R1)
+    }else{
+      args <- c(args, '-1', R1, '-2', R2)
+    }
   }
+  
+  
   if(dryrun){
     cmd <- paste(args, collapse = " ")
     message(salmonPath, " ", cmd)

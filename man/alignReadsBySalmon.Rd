@@ -8,10 +8,13 @@ alignReadsBySalmon(
   R1,
   R2,
   output,
+  singlecell_protocol,
+  whitelist,
   salmonPath = "salmon",
   cpus = 2,
   index = "TEindex",
   dryrun = TRUE,
+  tgMap = "seq2name.tsv",
   ...
 )
 }
@@ -20,6 +23,18 @@ alignReadsBySalmon(
 
 \item{output}{The output folder for salmon.}
 
+\item{singlecell_protocol}{If it is single cell data, please set it to
+dropseq / chromium / chromiumV3 depending on the type of
+single-cell protocol.}
+
+\item{whitelist}{This is an optional argument, where user can explicitly
+specify the whitelist CB to use for cell detection and CB sequence correction.
+Please note that this whitelist should not be the full list provided by 10x
+etc. It should be the barcodes.tsv.gz before or after filtering by
+cellRange or other tools. The tool will remove the suffix from each line in
+the barcode file and export to a new uncompressed in named as
+\$output.barcodes.tsv}
+
 \item{salmonPath}{The path to salmon executable file.}
 
 \item{cpus}{Threads number.}
@@ -27,6 +42,10 @@ alignReadsBySalmon(
 \item{index}{Output index folder.}
 
 \item{dryrun}{If true, print the command only.}
+
+\item{tgMap}{The file name for the seqnames. It is a tsv file with 2 columns
+without header. Both columns are the identical content for the reads names
+in the rmsk fasta file. See vignettes for help.}
 
 \item{...}{Parameters passed to system2.}
 }

@@ -16,11 +16,11 @@ devtools::install("jianhong/ratte")
 
 # Online documentation
 
-The full documentation is available [here](https:://jianhong.github.io/ratte).
+The full documentation is available at https:://jianhong.github.io/ratte.
 
 ```{r}
 ## load libraries
-library(ratter)
+library(ratte)
 library(AnnotationHub)
 library(BSgenome.Drerio.UCSC.danRer11)
 library(TxDb.Drerio.UCSC.danRer11.refGene)
@@ -76,4 +76,11 @@ lrt <- glmLRT(fit, coef=2)
 res <- as.data.frame(topTags(lrt, n=nrow(lrt)))
 ```
 
+# Single cell RNA-seq data
 
+From version 0.0.6, _ratte_ start to support single cell RNA-seq data from drop-seq
+and 10X. The required input ask the barcodes.tsv file from the output of upstream
+pipeline such as cellRanger.
+
+Please following the vignettes at https://jianhong.github.io/ratte/articles/ratte.html
+for scRNA-seq data.
