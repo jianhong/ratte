@@ -9,7 +9,7 @@ the necessary sequence files and annotations.
 
 # Installation
 
-```{r}
+```r
 library(devtools)
 devtools::install("jianhong/ratte")
 ```
@@ -18,7 +18,7 @@ devtools::install("jianhong/ratte")
 
 The full documentation is available at https:://jianhong.github.io/ratte.
 
-```{r}
+```r
 ## load libraries
 library(ratte)
 library(AnnotationHub)
