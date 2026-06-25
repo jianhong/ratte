@@ -74,38 +74,70 @@
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h1>
-<p><code>{r} library(devtools) devtools::install("jianhong/ratte")</code></p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"jianhong/ratte"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level1">
 <h1 id="online-documentation">Online documentation<a class="anchor" aria-label="anchor" href="#online-documentation"></a>
 </h1>
 <p>The full documentation is available at <a href="https:://jianhong.github.io/ratte" class="uri">https:://jianhong.github.io/ratte</a>.</p>
-<p>```{r} ## load libraries library(ratte) library(AnnotationHub) library(BSgenome.Drerio.UCSC.danRer11) library(TxDb.Drerio.UCSC.danRer11.refGene) library(edgeR)</p>
-<div class="section level2">
-<h2 id="get-repeatmasker-elements">get RepeatMasker elements<a class="anchor" aria-label="anchor" href="#get-repeatmasker-elements"></a>
-</h2>
-<p>ah &lt;- AnnotationHub() (rmsk &lt;- query(ah, c(‘RepeatMasker’, ‘Zebrafish’))) rmsk &lt;- rmsk[[‘AH98980’]]</p>
-</div>
-<div class="section level2">
-<h2 id="prepare-the-annotation-and-fasta-file">prepare the annotation and fasta file<a class="anchor" aria-label="anchor" href="#prepare-the-annotation-and-fasta-file"></a>
-</h2>
-<p>seq_anno &lt;- prepareSeq(Drerio, TxDb.Drerio.UCSC.danRer11.refGene, rmsk) saveFasta(seq_anno, ‘danRer11.rmsk.fasta.gz’)</p>
-</div>
-<div class="section level2">
-<h2 id="create-the-salmon-index">create the salmon index<a class="anchor" aria-label="anchor" href="#create-the-salmon-index"></a>
-</h2>
-<p>prepareSalmonIndex(salmonPath=‘salmon’, FaFile=‘danRer11.rmsk.fasta.gz’, index=‘TEindex’) ## align the reads fastqs &lt;- list(R1=c(‘WT1_R1.fq.gz’, ‘WT2_R1.fq.gz’, ‘KD1_R1.fq.gz’, ‘KD2_R1.fq.gz’), R2=c(‘WT1_R2.fq.gz’, ‘WT2_R2.fq.gz’, ‘KD1_R2.fq.gz’, ‘KD2_R2.fq.gz’), N=c(‘WT1’, ‘WT2’, ‘KD1’, ‘KD2’)) output_path &lt;- ‘salmon_output’ dir.create(output_path) for(i in seq_along(fastqs[[1]])){ alignReadsBySalmon(R1=fastqs[[‘R1’]][i], R2=fastqs[[‘R2’]][i], output=file.path(output_path, fastqs[[‘N’]][i]), index=‘TEindex’) }</p>
-</div>
-<div class="section level2">
-<h2 id="aggregate-alignments-to-repeat-element">Aggregate alignments to repeat element<a class="anchor" aria-label="anchor" href="#aggregate-alignments-to-repeat-element"></a>
-</h2>
-<p>quant_sfs &lt;- dir(output_path, ‘quant.sf’, full.names=TRUE, recursive=TRUE) qnames &lt;- c(‘WT1’, ‘WT2’, ‘KD1’, ‘KD2’) group &lt;- c(‘WT’, ‘WT’, ‘KD’, ‘KD’) ys &lt;- createDGELists(quant_sfs, qnames, seq_anno, select_feature = ‘all’, group=group, remove.zeros = TRUE)</p>
-</div>
-<div class="section level2">
-<h2 id="differential-analysis">Differential analysis<a class="anchor" aria-label="anchor" href="#differential-analysis"></a>
-</h2>
-<p>y &lt;- ys[[‘repName’]] keep &lt;- filterByExpr(y) y &lt;- y[keep, keep.lib.sizes=TRUE] design &lt;- model.matrix(~y<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mi>a</mi><mi>m</mi><mi>p</mi><mi>l</mi><mi>e</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">samples</annotation></semantics></math>group) y &lt;- estimateDisp(y, design) fit &lt;- glmFit(y, design) lrt &lt;- glmLRT(fit, coef=2) res &lt;- as.data.frame(topTags(lrt, n=nrow(lrt))) ```</p>
-</div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## load libraries</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jianhong/ratte" class="external-link">ratte</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">AnnotationHub</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BSgenome.Drerio.UCSC.danRer11</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">TxDb.Drerio.UCSC.danRer11.refGene</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioinf.wehi.edu.au/edgeR/" class="external-link">edgeR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## get RepeatMasker elements</span></span>
+<span><span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="va">rmsk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'RepeatMasker'</span>, <span class="st">'Zebrafish'</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">rmsk</span> <span class="op">&lt;-</span> <span class="va">rmsk</span><span class="op">[[</span><span class="st">'AH98980'</span><span class="op">]</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co">## prepare the annotation and fasta file</span></span>
+<span><span class="va">seq_anno</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prepareSeq.html">prepareSeq</a></span><span class="op">(</span><span class="va">Drerio</span>, <span class="va">TxDb.Drerio.UCSC.danRer11.refGene</span>, <span class="va">rmsk</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/saveFasta.html">saveFasta</a></span><span class="op">(</span><span class="va">seq_anno</span>, <span class="st">'danRer11.rmsk.fasta.gz'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## create the salmon index</span></span>
+<span><span class="fu"><a href="reference/prepareSalmonIndex.html">prepareSalmonIndex</a></span><span class="op">(</span>salmonPath<span class="op">=</span><span class="st">'salmon'</span>,</span>
+<span>                   FaFile<span class="op">=</span><span class="st">'danRer11.rmsk.fasta.gz'</span>,</span>
+<span>                   index<span class="op">=</span><span class="st">'TEindex'</span><span class="op">)</span></span>
+<span><span class="co">## align the reads</span></span>
+<span><span class="va">fastqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>R1<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'WT1_R1.fq.gz'</span>, <span class="st">'WT2_R1.fq.gz'</span>,</span>
+<span>                    <span class="st">'KD1_R1.fq.gz'</span>, <span class="st">'KD2_R1.fq.gz'</span><span class="op">)</span>,</span>
+<span>               R2<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'WT1_R2.fq.gz'</span>, <span class="st">'WT2_R2.fq.gz'</span>,</span>
+<span>                    <span class="st">'KD1_R2.fq.gz'</span>, <span class="st">'KD2_R2.fq.gz'</span><span class="op">)</span>,</span>
+<span>               N<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'WT1'</span>, <span class="st">'WT2'</span>, <span class="st">'KD1'</span>, <span class="st">'KD2'</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">output_path</span> <span class="op">&lt;-</span> <span class="st">'salmon_output'</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output_path</span><span class="op">)</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">fastqs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<span><span class="fu"><a href="reference/alignReadsBySalmon.html">alignReadsBySalmon</a></span><span class="op">(</span>R1<span class="op">=</span><span class="va">fastqs</span><span class="op">[[</span><span class="st">'R1'</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,</span>
+<span>                   R2<span class="op">=</span><span class="va">fastqs</span><span class="op">[[</span><span class="st">'R2'</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>,</span>
+<span>                   output<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_path</span>, <span class="va">fastqs</span><span class="op">[[</span><span class="st">'N'</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                   index<span class="op">=</span><span class="st">'TEindex'</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co">## Aggregate alignments to repeat element</span></span>
+<span><span class="va">quant_sfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">output_path</span>, <span class="st">'quant.sf'</span>,</span>
+<span>                 full.names<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>                 recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">qnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'WT1'</span>, <span class="st">'WT2'</span>, <span class="st">'KD1'</span>, <span class="st">'KD2'</span><span class="op">)</span></span>
+<span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'WT'</span>, <span class="st">'WT'</span>, <span class="st">'KD'</span>, <span class="st">'KD'</span><span class="op">)</span></span>
+<span><span class="va">ys</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/createDGELists.html">createDGELists</a></span><span class="op">(</span><span class="va">quant_sfs</span>, <span class="va">qnames</span>, <span class="va">seq_anno</span>,</span>
+<span>                     select_feature <span class="op">=</span> <span class="st">'all'</span>,</span>
+<span>                     group<span class="op">=</span><span class="va">group</span>,</span>
+<span>                     remove.zeros <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Differential analysis</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">ys</span><span class="op">[[</span><span class="st">'repName'</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/filterByExpr.html" class="external-link">filterByExpr</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[</span><span class="va">keep</span>, keep.lib.sizes<span class="op">=</span><span class="cn">TRUE</span><span class="op">]</span></span>
+<span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="va">y</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/estimateDisp.html" class="external-link">estimateDisp</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">design</span><span class="op">)</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/glmfit.html" class="external-link">glmFit</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">design</span><span class="op">)</span></span>
+<span><span class="va">lrt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/glmLRT.html" class="external-link">glmLRT</a></span><span class="op">(</span><span class="va">fit</span>, coef<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/topTags.html" class="external-link">topTags</a></span><span class="op">(</span><span class="va">lrt</span>, n<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">lrt</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level1">
 <h1 id="single-cell-rna-seq-data">Single cell RNA-seq data<a class="anchor" aria-label="anchor" href="#single-cell-rna-seq-data"></a>
@@ -162,7 +194,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
