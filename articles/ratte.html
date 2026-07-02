@@ -158,7 +158,7 @@ of <code><a href="https://rdrr.io/pkg/GenomicFeatures/man/transcriptsBy.html" cl
 <code class="sourceCode R"><span><span class="va">ah</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">AnnotationHub</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">(</span><span class="va">rmsk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AnnotationHub/man/AnnotationHub-class.html" class="external-link">query</a></span><span class="op">(</span><span class="va">ah</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'RepeatMasker'</span>, <span class="st">'Zebrafish'</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## AnnotationHub with 1 record</span></span>
-<span><span class="co">## # snapshotDate(): 2026-06-17</span></span>
+<span><span class="co">## # snapshotDate(): 2026-06-30</span></span>
 <span><span class="co">## # names(): AH98980</span></span>
 <span><span class="co">## # $dataprovider: UCSC</span></span>
 <span><span class="co">## # $species: Danio rerio</span></span>
@@ -211,7 +211,7 @@ export the command by setting <code>dryrun</code> parameter to TRUE.</p>
 <span>                   FaFile<span class="op">=</span><span class="va">rna_outfile</span>,</span>
 <span>                   index<span class="op">=</span><span class="st">'RNA_TEindex'</span>,</span>
 <span>                   dryrun<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/Rtmp6HMKlk/file1018714e23f.fa.gz -i RNA_TEindex -n</span></span></code></pre>
+<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/RtmpATTY9L/filec086495830f.fa.gz -i RNA_TEindex -n</span></span></code></pre>
 <p>Second, we will align reads to salmon index.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/alignReadsBySalmon.html">alignReadsBySalmon</a></span><span class="op">(</span><span class="st">'sample1.R1.fq.gz'</span>, <span class="st">'sample1.R2.fq.gz'</span>,</span>
@@ -301,6 +301,7 @@ determined by gene level counts.</p>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">ys</span><span class="op">[[</span><span class="st">'repName'</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/filterByExpr.html" class="external-link">filterByExpr</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[</span><span class="va">keep</span>, keep.lib.sizes<span class="op">=</span><span class="cn">TRUE</span><span class="op">]</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/calcNormFactors.html" class="external-link">normLibSizes</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="va">y</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/estimateDisp.html" class="external-link">estimateDisp</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">design</span><span class="op">)</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/glmfit.html" class="external-link">glmFit</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">design</span><span class="op">)</span></span>
@@ -399,7 +400,7 @@ export the command by setting <code>dryrun</code> parameter to TRUE.</p>
 <span>                   FaFile<span class="op">=</span><span class="va">atac_outfile</span>,</span>
 <span>                   index<span class="op">=</span><span class="st">'ATAC_TEindex'</span>,</span>
 <span>                   dryrun<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/Rtmp6HMKlk/file10186ec7a216.fa.gz -i ATAC_TEindex -n</span></span></code></pre>
+<pre><code><span><span class="co">## salmon index --threads 2 -t /tmp/RtmpATTY9L/filec0837802d8b.fa.gz -i ATAC_TEindex -n</span></span></code></pre>
 <p>Second, we will align reads to salmon index.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/alignReadsBySalmon.html">alignReadsBySalmon</a></span><span class="op">(</span><span class="st">'sample1.R1.fq.gz'</span>, <span class="st">'sample1.R2.fq.gz'</span>,</span>
@@ -477,6 +478,7 @@ from the <code>quant.sf</code> files and generate a list of
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">atac_ys</span><span class="op">[[</span><span class="st">'repName'</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/filterByExpr.html" class="external-link">filterByExpr</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">y</span><span class="op">[</span><span class="va">keep</span>, keep.lib.sizes<span class="op">=</span><span class="cn">TRUE</span><span class="op">]</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/calcNormFactors.html" class="external-link">normLibSizes</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="va">design</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/model.matrix.html" class="external-link">model.matrix</a></span><span class="op">(</span><span class="op">~</span><span class="va">y</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">group</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/estimateDisp.html" class="external-link">estimateDisp</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">design</span><span class="op">)</span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/glmfit.html" class="external-link">glmFit</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">design</span><span class="op">)</span></span>
@@ -511,58 +513,58 @@ from the <code>quant.sf</code> files and generate a list of
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="va">m</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">logFC.RNA</span><span class="op">)</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/base/sign.html" class="external-link">sign</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">logFC.ATAC</span><span class="op">)</span>, </span>
 <span>               <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">m</span><span class="op">$</span><span class="va">PValue.RNA</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">m</span><span class="op">$</span><span class="va">PValue.ATAC</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">m</span>, n<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##      Row.names logFC.RNA logCPM.RNA    LR.RNA   PValue.RNA      FDR.RNA</span></span>
-<span><span class="co">## 38  DNA-8-9_DR -1.166921   11.39641  9.701471 0.0018412056 0.0059089855</span></span>
-<span><span class="co">## 28 DNA-1-3B_DR -1.617703   11.15533 16.340213 0.0000529288 0.0005618596</span></span>
+<pre><code><span><span class="co">##        Row.names logFC.RNA logCPM.RNA    LR.RNA  PValue.RNA      FDR.RNA</span></span>
+<span><span class="co">## 28   DNA-1-3B_DR -1.070268   11.15088  5.521309 1.87862e-02 0.0480091713</span></span>
+<span><span class="co">## 77 Kolobok-N3_DR  1.287140   11.70403 17.343795 3.11915e-05 0.0002152214</span></span>
 <span><span class="co">##    logFC.ATAC logCPM.ATAC  LR.ATAC PValue.ATAC  FDR.ATAC</span></span>
-<span><span class="co">## 38 -0.3725652    12.19434 5.480980  0.01922448 0.4170233</span></span>
-<span><span class="co">## 28 -0.3158521    12.45271 3.925897  0.04754781 0.5363393</span></span></code></pre>
+<span><span class="co">## 28 -0.3296747    12.45264 4.218610  0.03998291 0.4510073</span></span>
+<span><span class="co">## 77  0.3000950    12.30405 3.871167  0.04912235 0.5327885</span></span></code></pre>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">seq_anno</span><span class="op">[</span><span class="va">seq_anno</span><span class="op">$</span><span class="va">repName</span><span class="op">==</span><span class="va">m</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 9 columns</span></span>
 <span><span class="co">##                  seqname     feature     repName    repClass   repFamily</span></span>
 <span><span class="co">##              &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">## 1 e7b2400cc9f303582e8d..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 2 a3482d5dfc7994ca57dc..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 3 b5bc5a06d7fe994c32cf..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 4 633c41ea5abc604a0f54..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 5 e76f7d6b0d501f6bd997..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 6 dab0e247e710af6140ed..      intron  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
+<span><span class="co">## 1 ccbc9b7e15b13f05f5b8..      intron DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 2 633c41ea5abc604a0f54..      intron DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 3 e76f7d6b0d501f6bd997..      intron DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 4 dd821a62b49921c46abe..      intron DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 5 b94ba937efaeed940f7e..  intergenic DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 6 4b7492334f8ab7573165..  intergenic DNA-1-3B_DR         DNA         DNA</span></span>
 <span><span class="co">##           N                    idx                tx_name</span></span>
 <span><span class="co">##   &lt;integer&gt;            &lt;character&gt;            &lt;character&gt;</span></span>
-<span><span class="co">## 1         1 chr25:14166077-14166..           NM_001128347</span></span>
-<span><span class="co">## 2         2 chr25:14251818-14251.. NM_001128347,NM_0011..</span></span>
-<span><span class="co">## 3         1 chr25:14879440-14879..              NM_200452</span></span>
-<span><span class="co">## 4         1 chr25:11941291-11941..           NM_001256664</span></span>
-<span><span class="co">## 5         2 chr25:12061702-12061.. NM_001256664,NM_0012..</span></span>
-<span><span class="co">## 6         1 chr25:13092036-13092..           NM_001122750</span></span>
+<span><span class="co">## 1         2 chr25:14712279-14712..    NM_200042,NM_200042</span></span>
+<span><span class="co">## 2         3 chr25:11925364-11925.. NM_001256664,NM_0012..</span></span>
+<span><span class="co">## 3         2 chr25:12088553-12088.. NM_001256664,NM_0012..</span></span>
+<span><span class="co">## 4         2 chr25:13749602-13749.. NM_001037667,NM_0010..</span></span>
+<span><span class="co">## 5         1 chr25:11280259-11280..                     NA</span></span>
+<span><span class="co">## 6         1 chr25:11379586-11379..                     NA</span></span>
 <span><span class="co">##                       seq</span></span>
 <span><span class="co">##            &lt;DNAStringSet&gt;</span></span>
-<span><span class="co">## 1 GTGCGTACAC...TTTTTGCCAG</span></span>
-<span><span class="co">## 2 GTGAGTTGAA...TCTTTCCCAG</span></span>
-<span><span class="co">## 3 GTAGGTGTTC...TGATTGGCAG</span></span>
-<span><span class="co">## 4 GTAAGCAAGT...CTCTTCGCAG</span></span>
-<span><span class="co">## 5 GTGAGTCCTG...TCCCCTGCAG</span></span>
-<span><span class="co">## 6 GTAAGAGCTC...TTTTGTGCAG</span></span></code></pre>
+<span><span class="co">## 1 GTAAGCATTT...GCTCTCACAG</span></span>
+<span><span class="co">## 2 GTAAGCAAGT...CTCTTCGCAG</span></span>
+<span><span class="co">## 3 GTGAGTCCTG...TCCCCTGCAG</span></span>
+<span><span class="co">## 4 GTACAACTTT...TATGTCTCAG</span></span>
+<span><span class="co">## 5 ATGCTGTGTT...AACACAGCAT</span></span>
+<span><span class="co">## 6 CATAGACAAT...CAGCGTTGAT</span></span></code></pre>
 <div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">atac_seq_anno</span><span class="op">[</span><span class="va">atac_seq_anno</span><span class="op">$</span><span class="va">repName</span><span class="op">==</span><span class="va">m</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">]</span>, <span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 9 columns</span></span>
 <span><span class="co">##                  seqname     feature     repName    repClass   repFamily</span></span>
 <span><span class="co">##              &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">## 1 4f471f3c7c118eeb7ddb..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 2 6a837e21d38fa0082c0f..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 3 ff2e591b5fc41b6cff86..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 4 0929655c4ade7d453989..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 5 b2ec5656f2053898434e..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">## 6 ee081dff4dfbe18cb247..        peak  DNA-8-9_DR         DNA     hAT-Ac?</span></span>
-<span><span class="co">##           N                    idx      tx_name                     seq</span></span>
-<span><span class="co">##   &lt;integer&gt;            &lt;character&gt;  &lt;character&gt;          &lt;DNAStringSet&gt;</span></span>
-<span><span class="co">## 1         1 chr25:11030723-11030.. NM_001265607 AAAATGCTTT...ATTAGTGTAG</span></span>
-<span><span class="co">## 2         1 chr25:11324782-11325.. NM_001265607 GGCACTTGTG...ACATATTTAT</span></span>
-<span><span class="co">## 3         1 chr25:11358819-11358.. NM_001265607 GATGTCTCCT...GTAGGTCTTA</span></span>
-<span><span class="co">## 4         1 chr25:12255981-12256.. NM_001256664 ACTTTCCTTC...GCCAACTGAC</span></span>
-<span><span class="co">## 5         1 chr25:12322481-12322..    NM_199670 TTTTTTGTTG...TCGCTGGTTC</span></span>
-<span><span class="co">## 6         1 chr25:12322481-12322..    NM_199670 GTTCGCGTGG...GTGTGTGAAT</span></span></code></pre>
+<span><span class="co">## 1 2f2f8c453b1dedc92f1a..        peak DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 2 05ec2e1871dfd7ee9923..        peak DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 3 4f7e425862096f5ba2d6..        peak DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 4 450c0aa34a998d6b8445..        peak DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 5 097ac2ca04aa71b4b267..        peak DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">## 6 86ae7308c00721180534..        peak DNA-1-3B_DR         DNA         DNA</span></span>
+<span><span class="co">##           N                    idx             tx_name                     seq</span></span>
+<span><span class="co">##   &lt;integer&gt;            &lt;character&gt;         &lt;character&gt;          &lt;DNAStringSet&gt;</span></span>
+<span><span class="co">## 1         1 chr25:11280259-11280..        NM_001265607 TAGCACAACA...TGATGAACCT</span></span>
+<span><span class="co">## 2         1 chr25:11379586-11379..        NM_001265607 AAAAATCTAT...TGCTACATCA</span></span>
+<span><span class="co">## 3         1 chr25:11703440-11704..        NM_001256664 GAATATTTTG...ACTCGTGCTG</span></span>
+<span><span class="co">## 4         1 chr25:12393340-12393..           NM_199670 ACATGAGTAC...TATCTGCCCG</span></span>
+<span><span class="co">## 5         2 chr25:14712279-14712.. NM_200042,NM_200042 CAGCGTCGAT...CATTGACTTA</span></span>
+<span><span class="co">## 6         1 chr25:13317302-13317..        NM_001045173 AAAAATAAAT...TCCTAATTTG</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="for-transcripts-level">For transcripts level<a class="anchor" aria-label="anchor" href="#for-transcripts-level"></a>
@@ -670,17 +672,17 @@ from the <code>quant.sf</code> files and generate a list of
 <span><span class="co">## [11] BiocIO_1.23.3                          </span></span>
 <span><span class="co">## [12] Biostrings_2.81.3                      </span></span>
 <span><span class="co">## [13] XVector_0.53.0                         </span></span>
-<span><span class="co">## [14] AnnotationHub_4.3.1                    </span></span>
+<span><span class="co">## [14] AnnotationHub_4.3.2                    </span></span>
 <span><span class="co">## [15] BiocFileCache_3.3.0                    </span></span>
 <span><span class="co">## [16] dbplyr_2.6.0                           </span></span>
-<span><span class="co">## [17] edgeR_4.11.1                           </span></span>
+<span><span class="co">## [17] edgeR_4.11.4                           </span></span>
 <span><span class="co">## [18] limma_3.69.2                           </span></span>
 <span><span class="co">## [19] rtracklayer_1.73.0                     </span></span>
 <span><span class="co">## [20] GenomicRanges_1.65.0                   </span></span>
 <span><span class="co">## [21] Seqinfo_1.3.0                          </span></span>
 <span><span class="co">## [22] IRanges_2.47.2                         </span></span>
-<span><span class="co">## [23] S4Vectors_0.51.3                       </span></span>
-<span><span class="co">## [24] BiocGenerics_0.59.7                    </span></span>
+<span><span class="co">## [23] S4Vectors_0.51.5                       </span></span>
+<span><span class="co">## [24] BiocGenerics_0.59.8                    </span></span>
 <span><span class="co">## [25] generics_0.1.4                         </span></span>
 <span><span class="co">## [26] ratte_0.0.6                            </span></span>
 <span><span class="co">## [27] BiocStyle_2.41.0                       </span></span>
