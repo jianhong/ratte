@@ -212,6 +212,7 @@ library(pheatmap)
 y <- ys[['repName']]
 keep <- filterByExpr(y)
 y <- y[keep, keep.lib.sizes=TRUE]
+y <- normLibSizes(y)
 design <- model.matrix(~y$samples$group)
 y <- estimateDisp(y, design)
 fit <- glmFit(y, design)
@@ -350,6 +351,7 @@ atac_ys[[1]]
 y <- atac_ys[['repName']]
 keep <- filterByExpr(y)
 y <- y[keep, keep.lib.sizes=TRUE]
+y <- normLibSizes(y)
 design <- model.matrix(~y$samples$group)
 y <- estimateDisp(y, design)
 fit <- glmFit(y, design)
